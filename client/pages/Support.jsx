@@ -299,6 +299,8 @@ export default function Support() {
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
   const [isFiltersOpen, setIsFiltersOpen] = useState(true);
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState([]);
 
   const clientsOptions = Array.from(new Set(["All Clients", ...clients, ...((activitiesList||[]).map(a => a.linkedClient))])).filter(Boolean);
 
@@ -498,6 +500,56 @@ export default function Support() {
               >
                 Reset Filters
               </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSelectionMode((m) => {
+                  const next = !m; if (!next) setSelectedIds([]); return next;
+                })}
+                className={selectionMode ? "border-gray-200 text-gray-700 hover:bg-gray-50" : "border-blue-200 text-blue-700 hover:bg-blue-50"}
+                title="Enable selection to choose tickets"
+              >
+                {selectionMode ? "Exit Select" : "Select Tickets"}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSelectedIds(filteredSupportActivities.map(a => a.id))}
+                disabled={!selectionMode || filteredSupportActivities.length === 0}
+              >
+                Select All
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSelectedIds([])}
+                disabled={!selectionMode || selectedIds.length === 0}
+              >
+                Clear
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  if (!selectionMode || selectedIds.length === 0) return;
+                  const should = window.confirm(`Delete ${selectedIds.length} selected tickets?`);
+                  if (!should) return;
+                  try {
+                    const saved = localStorage.getItem('activitiesList');
+                    const list = saved ? JSON.parse(saved) : [];
+                    const idSet = new Set(selectedIds);
+                    const updated = Array.isArray(list) ? list.filter(a => !idSet.has(a.id)) : [];
+                    localStorage.setItem('activitiesList', JSON.stringify(updated));
+                    window.dispatchEvent(new Event('activitiesListUpdated'));
+                    setSelectedIds([]);
+                    setSelectionMode(false);
+                  } catch {}
+                }}
+                className="border-red-200 text-red-700 hover:bg-red-50"
+                disabled={!selectionMode || selectedIds.length === 0}
+              >
+                Delete Selected {selectedIds.length > 0 ? `(${selectedIds.length})` : ""}
+              </Button>
             </div>
           </div>
         </CardHeader>
@@ -649,6 +701,14 @@ export default function Support() {
               <div className="flex items-center justify-between">
                 <div className="flex-1">
                   <div className="flex items-center space-x-2 mb-3 mt-1">
+                    {selectionMode && (
+                      <input
+                        type="checkbox"
+                        className="w-4 h-4 text-blue-600 border-gray-300 rounded"
+                        checked={selectedIds.includes(activity.id)}
+                        onChange={() => setSelectedIds((prev) => prev.includes(activity.id) ? prev.filter(x => x !== activity.id) : [...prev, activity.id])}
+                      />
+                    )}
                     <h3 className="font-semibold text-foreground">{activity.linkedClient}</h3>
                     <Badge variant="outline" className={getFilterStatusColor(activity.status)}>{activity.status}</Badge>
                     {activity.ticketType && (
