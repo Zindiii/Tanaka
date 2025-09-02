@@ -152,7 +152,7 @@ const clientAddresses = {
 const activityTypes = ["All Types", "Call", "Email", "Online Meeting", "In-person Meeting"];
 const categories = ["All Categories", "Sales", "Support"];
 const supportTicketCategories = ["All Categories", "Bug", "Question", "Feature", "Training"];
-const statuses = ["All Statuses", "To Do", "In Progress", "Done"];
+const statuses = ["All Statuses", "To Do", "In Progress", "Done", "Resolved"];
 const teamMembers = ["All Members", "Ana Marić", "Marko Petrović", "Petra Babić", "Luka Novak", "Sofia Antić"];
 const priorities = ["All Priorities", "Low", "Medium", "High", "Urgent"];
 const defaultClients = ["All Clients", "Zagreb Municipality", "Sports Club Dinamo", "Split City Council", "Tech Solutions Ltd"];
@@ -162,6 +162,7 @@ const getStatusColor = (status) => {
     case "To Do": return "bg-blue-100 text-blue-800 border-blue-200";
     case "In Progress": return "bg-yellow-100 text-yellow-800 border-yellow-200";
     case "Done": return "bg-green-100 text-green-800 border-green-200";
+    case "Resolved": return "bg-emerald-100 text-emerald-800 border-emerald-200";
     default: return "bg-gray-100 text-gray-800 border-gray-200";
   }
 };
@@ -668,6 +669,25 @@ export default function Activities() {
     window.dispatchEvent(new Event('activitiesListUpdated'));
   };
 
+  const toggleResolved = (id) => {
+    const updated = activitiesList.map(a => {
+      if (a.id !== id) return a;
+      const isResolved = a.status === 'Resolved';
+      const nextStatus = isResolved ? (a.previousStatus || 'To Do') : 'Resolved';
+      const logAction = isResolved ? 'Reopened' : 'Resolved';
+      const previousStatus = isResolved ? undefined : (a.status || 'To Do');
+      return {
+        ...a,
+        status: nextStatus,
+        previousStatus,
+        activityLog: [...(a.activityLog || []), { user: Array.isArray(a.responsible) ? a.responsible.join(', ') : '', action: logAction, timestamp: new Date().toLocaleString() }]
+      };
+    });
+    setActivitiesList(updated);
+    localStorage.setItem('activitiesList', JSON.stringify(updated));
+    window.dispatchEvent(new Event('activitiesListUpdated'));
+  };
+
   return (
     <div className="p-6 space-y-6 bg-gradient-to-br from-blue-50 via-white to-blue-100 min-h-screen">
       {/* Header */}
@@ -940,6 +960,7 @@ export default function Activities() {
                       <SelectItem value="To Do" className={getStatusColor("To Do") + " hover:opacity-90"}>To Do</SelectItem>
                       <SelectItem value="In Progress" className={getStatusColor("In Progress") + " hover:opacity-90"}>In Progress</SelectItem>
                       <SelectItem value="Done" className={getStatusColor("Done") + " hover:opacity-90"}>Done</SelectItem>
+                      <SelectItem value="Resolved" className={getStatusColor("Resolved") + " hover:opacity-90"}>Resolved</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -1380,6 +1401,16 @@ export default function Activities() {
                     <Button
                       variant="outline"
                       size="sm"
+                      onClick={() => toggleResolved(activity.id)}
+                      className={activity.status === 'Resolved' ? 'border-gray-200 text-gray-600 hover:bg-gray-50' : 'border-emerald-200 text-emerald-600 hover:bg-emerald-50'}
+                      title={activity.status === 'Resolved' ? 'Reopen ticket' : 'Mark as Resolved'}
+                    >
+                      <CheckCircle className="h-3 w-3 mr-1" />
+                      {activity.status === 'Resolved' ? 'Reopen' : 'Resolve'}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
                       onClick={() => handleDeleteActivity(activity.id)}
                       className="border-red-200 text-red-600 hover:bg-red-50"
                     >
@@ -1815,10 +1846,11 @@ export default function Activities() {
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="To Do" className={getStatusColor("To Do") + " hover:opacity-90"}>To Do</SelectItem>
-                    <SelectItem value="In Progress" className={getStatusColor("In Progress") + " hover:opacity-90"}>In Progress</SelectItem>
-                    <SelectItem value="Done" className={getStatusColor("Done") + " hover:opacity-90"}>Done</SelectItem>
-                  </SelectContent>
+                      <SelectItem value="To Do" className={getStatusColor("To Do") + " hover:opacity-90"}>To Do</SelectItem>
+                      <SelectItem value="In Progress" className={getStatusColor("In Progress") + " hover:opacity-90"}>In Progress</SelectItem>
+                      <SelectItem value="Done" className={getStatusColor("Done") + " hover:opacity-90"}>Done</SelectItem>
+                      <SelectItem value="Resolved" className={getStatusColor("Resolved") + " hover:opacity-90"}>Resolved</SelectItem>
+                    </SelectContent>
                 </Select>
               </div>
               <div className="space-y-2">
