@@ -46,7 +46,7 @@ import {
 const unitTypes = ["All Types", "Government", "Independent"];
 const organizationCategories = ["All Categories", "County", "Municipality", "City", "Sports Club", "SME", "Craftsmen", "Association"];
 const statuses = ["All Statuses", "Active", "Expired", "Potential", "Client", "Former Client", "Negotiation in Progress", "Not Contacted", "Rejected"];
-const phases = ["All Phases", "First contact", "interested", "Offer sent", "Accepted", "Contract signed", "implementation"];
+const phases = ["All Phases", "New", "First contact", "interested", "Offer sent", "Accepted", "Contract signed", "implementation", "Declined"];
 const nextPhases = ["All Next Phases", "Follow-up Call", "Proposal Submission", "Contract Signing", "Implementation", "Review Meeting", "Renewal Discussion"];
 const orgTeamMembers = ["Ana Marić", "Marko Petrović", "Petra Babić", "Luka Novak", "Sofia Antić"];
 
@@ -67,12 +67,14 @@ const getStatusColor = (status) => {
 
 const getPhaseColor = (phase) => {
   switch (phase) {
+    case "New": return "bg-gray-100 text-gray-800 border-gray-200";
     case "First contact": return "bg-blue-100 text-blue-800 border-blue-200";
     case "interested": return "bg-yellow-100 text-yellow-800 border-yellow-200";
     case "Offer sent": return "bg-cyan-100 text-cyan-800 border-cyan-200";
     case "Accepted": return "bg-green-100 text-green-800 border-green-200";
     case "Contract signed": return "bg-purple-100 text-purple-800 border-purple-200";
     case "implementation": return "bg-teal-100 text-teal-800 border-teal-200";
+    case "Declined": return "bg-red-100 text-red-800 border-red-200";
     default: return "bg-gray-100 text-gray-800 border-gray-200";
   }
 };
