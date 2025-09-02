@@ -81,7 +81,7 @@ export default function Teams() {
           </div>
         </div>
         <h1 className="text-4xl font-bold text-dark-blue mb-2">
-          Team Management
+          {user?.department === 'Sales' ? 'Sales Team Management' : user?.department === 'Support' ? 'Support Team Management' : 'Team Management'}
         </h1>
         <p className="text-xl text-gray-600 mb-4">
           Comprehensive team overview and performance tracking
