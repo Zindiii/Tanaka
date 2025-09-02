@@ -44,13 +44,21 @@ export default function Teams() {
   // Get department-scoped team members
   const teamMembers = useMemo(() => {
     const allUsers = getAllUsers();
-    const scoped = user?.department === 'Support'
-      ? allUsers.filter(m => m.department === 'Support')
-      : user?.department === 'Sales'
-        ? allUsers.filter(m => m.department === 'Sales')
-        : allUsers;
+    const role = (user?.role || '').toLowerCase();
+    const isSalesRole = role.includes('sales');
+    const isSupportRole = role.includes('support');
+    const isManagerOrDirector = role.includes('manager') || role.includes('director');
+
+    const scoped = isManagerOrDirector
+      ? allUsers
+      : isSalesRole
+        ? allUsers.filter(m => (m.department === 'Sales') || ((m.role || '').toLowerCase().includes('sales')))
+        : isSupportRole
+          ? allUsers.filter(m => (m.department === 'Support') || ((m.role || '').toLowerCase().includes('support')))
+          : allUsers;
+
     return scoped.map((member, index) => generateMemberMetrics(member, index));
-  }, [getAllUsers, user?.department]);
+  }, [getAllUsers, user?.role]);
 
   // Load created teams from localStorage
   const [createdTeams, setCreatedTeams] = useState(() => {
@@ -81,7 +89,13 @@ export default function Teams() {
           </div>
         </div>
         <h1 className="text-4xl font-bold text-dark-blue mb-2">
-          {user?.department === 'Sales' ? 'Sales Team Management' : user?.department === 'Support' ? 'Support Team Management' : 'Team Management'}
+          {(() => {
+            const role = (user?.role || '').toLowerCase();
+            if (role.includes('sales')) return 'Sales Team Management';
+            if (role.includes('support')) return 'Support Team Management';
+            if (role.includes('manager') || role.includes('director')) return 'Team Management';
+            return 'Team Management';
+          })()}
         </h1>
         <p className="text-xl text-gray-600 mb-4">
           Comprehensive team overview and performance tracking
