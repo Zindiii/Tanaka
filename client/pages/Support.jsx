@@ -140,6 +140,8 @@ const getFilterStatusColor = (status) => {
   switch (status) {
     case "Done":
       return "bg-green-100 text-green-800 border-green-200";
+    case "Resolved":
+      return "bg-emerald-100 text-emerald-800 border-emerald-200";
     case "In Progress":
       return "bg-yellow-100 text-yellow-800 border-yellow-200";
     case "To Do":
@@ -283,7 +285,7 @@ export default function Support() {
 
   // Activities-style filters for Support
   const supportTicketCategories = ["All Categories", "Bug", "Question", "Feature", "Training"];
-  const statuses = ["All Statuses", "To Do", "In Progress", "Done"];
+  const statuses = ["All Statuses", "To Do", "In Progress", "Done", "Resolved"];
   const priorities = ["All Priorities", "Low", "Medium", "High", "Urgent"];
   const teamMembersOptions = ["All Members", ...TEAM_MEMBERS.map(m => m.name)];
 
@@ -331,6 +333,28 @@ export default function Support() {
   const showPremiumSupport = () => {
     setSelectedTickets(premiumTickets);
     setIsPremiumDialogOpen(true);
+  };
+
+  const toggleActivityResolved = (id) => {
+    try {
+      const saved = localStorage.getItem('activitiesList');
+      const list = saved ? JSON.parse(saved) : [];
+      const updated = Array.isArray(list) ? list.map(a => {
+        if (a.id !== id) return a;
+        const isResolved = a.status === 'Resolved';
+        const nextStatus = isResolved ? (a.previousStatus || 'To Do') : 'Resolved';
+        const logAction = isResolved ? 'Reopened' : 'Resolved';
+        const previousStatus = isResolved ? undefined : (a.status || 'To Do');
+        return {
+          ...a,
+          status: nextStatus,
+          previousStatus,
+          activityLog: [...(a.activityLog || []), { user: Array.isArray(a.responsible) ? a.responsible.join(', ') : '', action: logAction, timestamp: new Date().toLocaleString() }]
+        };
+      }) : [];
+      localStorage.setItem('activitiesList', JSON.stringify(updated));
+      window.dispatchEvent(new Event('activitiesListUpdated'));
+    } catch {}
   };
 
 
@@ -626,7 +650,7 @@ export default function Support() {
                 <div className="flex-1">
                   <div className="flex items-center space-x-2 mb-3 mt-1">
                     <h3 className="font-semibold text-foreground">{activity.linkedClient}</h3>
-                    <Badge variant="outline">{activity.status}</Badge>
+                    <Badge variant="outline" className={getFilterStatusColor(activity.status)}>{activity.status}</Badge>
                     {activity.ticketType && (
                       <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-200">
                         {activity.ticketType}
@@ -667,6 +691,16 @@ export default function Support() {
                     >
                       <Eye className="h-3 w-3 mr-1" />
                       View
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => toggleActivityResolved(activity.id)}
+                      className={activity.status === 'Resolved' ? 'border-gray-200 text-gray-600 hover:bg-gray-50' : 'border-emerald-200 text-emerald-600 hover:bg-emerald-50'}
+                      title={activity.status === 'Resolved' ? 'Reopen ticket' : 'Mark as Resolved'}
+                    >
+                      <CheckCircle className="h-3 w-3 mr-1" />
+                      {activity.status === 'Resolved' ? 'Reopen' : 'Resolve'}
                     </Button>
                     <Button
                       variant="outline"
@@ -799,7 +833,7 @@ export default function Support() {
             <div className="space-y-6">
               <div className="grid grid-cols-4 gap-4">
                 <div className="text-center p-4 bg-blue-50 rounded-lg">
-                  <Badge variant="outline">{selectedTicketActivity.status}</Badge>
+                  <Badge variant="outline" className={getFilterStatusColor(selectedTicketActivity.status)}>{selectedTicketActivity.status}</Badge>
                   <p className="text-xs text-gray-600 mt-1">Status</p>
                 </div>
                 <div className="text-center p-4 bg-blue-50 rounded-lg">
