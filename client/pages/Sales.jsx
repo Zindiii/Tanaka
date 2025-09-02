@@ -463,17 +463,19 @@ export default function Sales() {
   const orgToStage = (phase) => {
     const p = String(phase || "").toLowerCase();
     const map = {
-      "first contacted": "First contact",
-      "first contact": "First contact",
-      interested: "interested",
-      proposal: "Offer sent",
-      "offer sent": "Offer sent",
-      accepted: "Accepted",
-      contract: "Contract signed",
-      "contract signed": "Contract signed",
-      implementation: "implementation",
-      active: "implementation",
-    };
+    new: "First contact",
+    declined: "First contact",
+    "first contacted": "First contact",
+    "first contact": "First contact",
+    interested: "interested",
+    proposal: "Offer sent",
+    "offer sent": "Offer sent",
+    accepted: "Accepted",
+    contract: "Contract signed",
+    "contract signed": "Contract signed",
+    implementation: "implementation",
+    active: "implementation",
+  };
     return map[p] || "First contact";
   };
   const syncOrgFromLead = (lead) => {
