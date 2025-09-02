@@ -394,6 +394,16 @@ export default function Projects() {
       : p
     );
     saveProjects(updatedProjects);
+
+    try {
+      const saved = localStorage.getItem('activitiesList');
+      const list = saved ? JSON.parse(saved) : [];
+      const globalActivity = { ...newActivity, projectId: addActivityFor.id };
+      const updatedActivities = [globalActivity, ...list];
+      localStorage.setItem('activitiesList', JSON.stringify(updatedActivities));
+      window.dispatchEvent(new Event('activitiesListUpdated'));
+    } catch {}
+
     setAddActivityFor(null);
     setActivityForm({ activityType: "Call", date: new Date().toISOString().split('T')[0], time: new Date().toTimeString().slice(0,5), responsible: [], notes: "", status: "To Do", priority: "Medium" });
   };
