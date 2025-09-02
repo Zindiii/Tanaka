@@ -10,17 +10,19 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Calendar, CheckCircle, ClipboardCheck, Layers, ListChecks, Plus, Settings, Users, History, Clock } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
-const PHASES = ["First contact", "interested", "Offer sent", "Accepted", "Contract signed", "implementation"]; // ordered
+const PHASES = ["New", "First contact", "interested", "Offer sent", "Accepted", "Contract signed", "implementation", "Declined"]; // ordered
 const DEFAULT_TEAM_MEMBERS = ["Ana Marić", "Marko Petrović", "Petra Babić", "Luka Novak", "Sofia Antić"];
 
 const getStageBadge = (stage) => {
   switch (stage) {
+    case "New": return "bg-gray-100 text-gray-800 border-gray-200";
     case "First contact": return "bg-blue-100 text-blue-800 border-blue-200";
     case "interested": return "bg-yellow-100 text-yellow-800 border-yellow-200";
     case "Offer sent": return "bg-cyan-100 text-cyan-800 border-cyan-200";
     case "Accepted": return "bg-green-100 text-green-800 border-green-200";
     case "Contract signed": return "bg-purple-100 text-purple-800 border-purple-200";
     case "implementation": return "bg-teal-100 text-teal-800 border-teal-200";
+    case "Declined": return "bg-red-100 text-red-800 border-red-200";
     default: return "bg-gray-100 text-gray-800 border-gray-200";
   }
 };
