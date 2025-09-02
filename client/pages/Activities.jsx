@@ -420,20 +420,7 @@ export default function Activities() {
     }
   }, [getAllUsers]);
 
-  const roleFilteredActivities = React.useMemo(() => {
-    const isTicket = (a) => a?.isTicket === true || !!a?.ticketType;
-    const hasSupportAssignee = (a) => {
-      const resp = Array.isArray(a.responsible) ? a.responsible : (a.responsible ? [a.responsible] : []);
-      return resp.some(r => supportMemberNames.includes(r));
-    };
-    if (user?.department === "Support") {
-      return activitiesList.filter(a => isTicket(a) && hasSupportAssignee(a));
-    }
-    if (user?.department === "Sales") {
-      return activitiesList.filter(a => a.category === "Sales");
-    }
-    return activitiesList;
-  }, [activitiesList, user?.department, supportMemberNames]);
+  const roleFilteredActivities = activitiesList;
 
   // Filtered activities
   const filteredActivities = roleFilteredActivities.filter((activity) => {
