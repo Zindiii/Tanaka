@@ -154,7 +154,7 @@ const clientData = [
   }
 ];
 
-const NEW_PHASES = ["First contact","interested","Offer sent","Accepted","Contract signed","implementation"];
+const NEW_PHASES = ["New","First contact","interested","Offer sent","Accepted","Contract signed","implementation","Declined"];
 
 // Sample data from LRSU dashboard (for migration reference)
 const lrsuData = [

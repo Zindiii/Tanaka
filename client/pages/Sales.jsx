@@ -190,6 +190,8 @@ const getStatusFromStage = (stage) => {
 };
 const getStageColor = (stage) => {
   switch (String(stage)) {
+    case "New":
+      return "bg-gray-100 text-gray-800 border-gray-200";
     case "First contact":
       return "bg-blue-100 text-blue-800 border-blue-200";
     case "interested":
@@ -202,6 +204,8 @@ const getStageColor = (stage) => {
       return "bg-purple-100 text-purple-800 border-purple-200";
     case "implementation":
       return "bg-indigo-100 text-indigo-800 border-indigo-200";
+    case "Declined":
+      return "bg-red-100 text-red-800 border-red-200";
     default:
       return "bg-gray-100 text-gray-800 border-gray-200";
   }
@@ -463,17 +467,17 @@ export default function Sales() {
   const orgToStage = (phase) => {
     const p = String(phase || "").toLowerCase();
     const map = {
-      "first contacted": "First contact",
-      "first contact": "First contact",
-      interested: "interested",
-      proposal: "Offer sent",
-      "offer sent": "Offer sent",
-      accepted: "Accepted",
-      contract: "Contract signed",
-      "contract signed": "Contract signed",
-      implementation: "implementation",
-      active: "implementation",
-    };
+    "first contacted": "First contact",
+    "first contact": "First contact",
+    interested: "interested",
+    proposal: "Offer sent",
+    "offer sent": "Offer sent",
+    accepted: "Accepted",
+    contract: "Contract signed",
+    "contract signed": "Contract signed",
+    implementation: "implementation",
+    active: "implementation",
+  };
     return map[p] || "First contact";
   };
   const syncOrgFromLead = (lead) => {
@@ -526,7 +530,20 @@ export default function Sales() {
   // Initialize/Sync leads from organizations (preserve user changes like stage)
   useEffect(() => {
     const today = new Date().toISOString().split("T")[0];
-    const baseFromOrgs = (organizations || []).map((o, idx) => {
+    const isActiveOrgPhase = (phase) => {
+      const p = String(phase || "").toLowerCase();
+      return [
+        "first contact",
+        "interested",
+        "offer sent",
+        "accepted",
+        "contract signed",
+        "implementation",
+      ].includes(p);
+    };
+    const baseFromOrgs = (organizations || [])
+      .filter((o) => isActiveOrgPhase(o?.phase))
+      .map((o, idx) => {
       const contactName = [
         o?.contactPerson?.firstName,
         o?.contactPerson?.surname,
@@ -949,11 +966,6 @@ export default function Sales() {
         </div>
         <div className="flex items-center space-x-4">
           <Dialog open={isNewOpen} onOpenChange={setIsNewOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-                <UserPlus className="h-4 w-4 mr-2" /> Add Client
-              </Button>
-            </DialogTrigger>
             <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Add Client</DialogTitle>
