@@ -69,12 +69,6 @@ export default function Signup() {
   const departments = [
     "Sales",
     "Support",
-    "Marketing",
-    "Operations",
-    "Management",
-    "IT",
-    "Finance",
-    "HR",
   ];
 
   const handleInputChange = (e) => {
