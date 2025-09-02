@@ -302,7 +302,7 @@ export default function Dashboard() {
                 <Activity className="h-5 w-5" />
                 <span>Team Recent Activities</span>
               </CardTitle>
-              {user?.department !== 'Support' && (
+              {user?.department !== "Support" && (
                 <Button variant="ghost" size="sm" asChild>
                   <Link to="/projects">
                     View All <ArrowRight className="h-4 w-4 ml-1" />
@@ -440,7 +440,11 @@ export default function Dashboard() {
             >
               <Link to="/organization">
                 <Building className="h-6 w-6" />
-                <span className="text-sm font-medium">{user?.department === 'Sales' ? 'Add Organization' : 'View Organizations'}</span>
+                <span className="text-sm font-medium">
+                  {user?.department === "Sales"
+                    ? "Add Organization"
+                    : "View Organizations"}
+                </span>
               </Link>
             </Button>
             <Button

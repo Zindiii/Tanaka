@@ -66,10 +66,7 @@ export default function Signup() {
     "Director",
   ];
 
-  const departments = [
-    "Sales",
-    "Support",
-  ];
+  const departments = ["Sales", "Support"];
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;

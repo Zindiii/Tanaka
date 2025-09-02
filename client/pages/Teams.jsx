@@ -1,4 +1,10 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "../contexts/AuthContext";
@@ -23,8 +29,20 @@ const generateMemberMetrics = (member, index) => {
   const tasksMap = { 1: 5, 2: 3, 3: 7, 4: 2, 5: 4 };
   const weeklyTargetMap = { 1: 12, 2: 8, 3: 20, 4: 5, 5: 15 };
   const completedTargetMap = { 1: 10, 2: 7, 3: 18, 4: 4, 5: 13 };
-  const statusMap = { 1: "online", 2: "busy", 3: "online", 4: "away", 5: "online" };
-  const lastActivityMap = { 1: "2 minutes ago", 2: "15 minutes ago", 3: "5 minutes ago", 4: "1 hour ago", 5: "30 minutes ago" };
+  const statusMap = {
+    1: "online",
+    2: "busy",
+    3: "online",
+    4: "away",
+    5: "online",
+  };
+  const lastActivityMap = {
+    1: "2 minutes ago",
+    2: "15 minutes ago",
+    3: "5 minutes ago",
+    4: "1 hour ago",
+    5: "30 minutes ago",
+  };
 
   return {
     ...member,
@@ -34,7 +52,7 @@ const generateMemberMetrics = (member, index) => {
     weeklyTarget: weeklyTargetMap[member.id] || 10,
     completedTarget: completedTargetMap[member.id] || 8,
     status: statusMap[member.id] || "online",
-    lastActivity: lastActivityMap[member.id] || "Recently"
+    lastActivity: lastActivityMap[member.id] || "Recently",
   };
 };
 
@@ -44,17 +62,26 @@ export default function Teams() {
   // Get department-scoped team members
   const teamMembers = useMemo(() => {
     const allUsers = getAllUsers();
-    const role = (user?.role || '').toLowerCase();
-    const isSalesRole = role.includes('sales');
-    const isSupportRole = role.includes('support');
-    const isManagerOrDirector = role.includes('manager') || role.includes('director');
+    const role = (user?.role || "").toLowerCase();
+    const isSalesRole = role.includes("sales");
+    const isSupportRole = role.includes("support");
+    const isManagerOrDirector =
+      role.includes("manager") || role.includes("director");
 
     const scoped = isManagerOrDirector
       ? allUsers
       : isSalesRole
-        ? allUsers.filter(m => (m.department === 'Sales') || ((m.role || '').toLowerCase().includes('sales')))
+        ? allUsers.filter(
+            (m) =>
+              m.department === "Sales" ||
+              (m.role || "").toLowerCase().includes("sales"),
+          )
         : isSupportRole
-          ? allUsers.filter(m => (m.department === 'Support') || ((m.role || '').toLowerCase().includes('support')))
+          ? allUsers.filter(
+              (m) =>
+                m.department === "Support" ||
+                (m.role || "").toLowerCase().includes("support"),
+            )
           : allUsers;
 
     return scoped.map((member, index) => generateMemberMetrics(member, index));
@@ -62,7 +89,7 @@ export default function Teams() {
 
   // Load created teams from localStorage
   const [createdTeams, setCreatedTeams] = useState(() => {
-    const saved = localStorage.getItem('createdTeams');
+    const saved = localStorage.getItem("createdTeams");
     return saved ? JSON.parse(saved) : [];
   });
 
@@ -72,8 +99,14 @@ export default function Teams() {
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 right-10 w-16 h-16 bg-light-blue/20 rounded-full animate-bounce opacity-30"></div>
         <div className="absolute top-40 left-20 w-12 h-12 bg-blue-200/30 rounded-full animate-pulse opacity-30"></div>
-        <div className="absolute bottom-40 right-32 w-20 h-20 bg-light-blue/15 rounded-full animate-bounce opacity-30" style={{animationDelay: '1s'}}></div>
-        <div className="absolute bottom-20 left-10 w-14 h-14 bg-blue-100/40 rounded-full animate-pulse opacity-30" style={{animationDelay: '2s'}}></div>
+        <div
+          className="absolute bottom-40 right-32 w-20 h-20 bg-light-blue/15 rounded-full animate-bounce opacity-30"
+          style={{ animationDelay: "1s" }}
+        ></div>
+        <div
+          className="absolute bottom-20 left-10 w-14 h-14 bg-blue-100/40 rounded-full animate-pulse opacity-30"
+          style={{ animationDelay: "2s" }}
+        ></div>
       </div>
 
       {/* Header */}
@@ -90,11 +123,12 @@ export default function Teams() {
         </div>
         <h1 className="text-4xl font-bold text-dark-blue mb-2">
           {(() => {
-            const role = (user?.role || '').toLowerCase();
-            if (role.includes('sales')) return 'Sales Team Management';
-            if (role.includes('support')) return 'Support Team Management';
-            if (role.includes('manager') || role.includes('director')) return 'Team Management';
-            return 'Team Management';
+            const role = (user?.role || "").toLowerCase();
+            if (role.includes("sales")) return "Sales Team Management";
+            if (role.includes("support")) return "Support Team Management";
+            if (role.includes("manager") || role.includes("director"))
+              return "Team Management";
+            return "Team Management";
           })()}
         </h1>
         <p className="text-xl text-gray-600 mb-4">
@@ -111,7 +145,10 @@ export default function Teams() {
               <span>Team Overview</span>
             </CardTitle>
             {isManager() && (
-              <Button variant="outline" className="border-blue-200 text-blue-600 hover:bg-blue-50">
+              <Button
+                variant="outline"
+                className="border-blue-200 text-blue-600 hover:bg-blue-50"
+              >
                 <UserPlus className="h-4 w-4 mr-1" />
                 Add Member
               </Button>
@@ -132,18 +169,20 @@ export default function Teams() {
                 <div className="absolute top-4 right-4">
                   <div
                     className={`w-3 h-3 rounded-full ${
-                      member.status === 'online'
-                        ? 'bg-green-400 shadow-lg shadow-green-400/50'
-                        : member.status === 'busy'
-                        ? 'bg-red-400 shadow-lg shadow-red-400/50'
-                        : 'bg-gray-400'
+                      member.status === "online"
+                        ? "bg-green-400 shadow-lg shadow-green-400/50"
+                        : member.status === "busy"
+                          ? "bg-red-400 shadow-lg shadow-red-400/50"
+                          : "bg-gray-400"
                     }`}
                   />
                 </div>
 
                 {/* Avatar and basic info */}
                 <div className="text-center mb-6">
-                  <div className={`w-20 h-20 rounded-full bg-gradient-to-br ${member.bgColor} flex items-center justify-center mx-auto mb-4 shadow-xl text-white font-bold text-xl`}>
+                  <div
+                    className={`w-20 h-20 rounded-full bg-gradient-to-br ${member.bgColor} flex items-center justify-center mx-auto mb-4 shadow-xl text-white font-bold text-xl`}
+                  >
                     {member.avatar}
                   </div>
                   <h3 className="font-bold text-gray-800 text-lg leading-tight mb-1">
@@ -152,12 +191,12 @@ export default function Teams() {
                   <p className="text-sm text-blue-600 font-medium mb-2">
                     {member.role}
                   </p>
-                  <Badge 
-                    variant="outline" 
+                  <Badge
+                    variant="outline"
                     className={`text-xs ${
-                      member.department === 'Sales' 
-                        ? 'border-blue-200 text-blue-700 bg-blue-50' 
-                        : 'border-purple-200 text-purple-700 bg-purple-50'
+                      member.department === "Sales"
+                        ? "border-blue-200 text-blue-700 bg-blue-50"
+                        : "border-purple-200 text-purple-700 bg-purple-50"
                     }`}
                   >
                     {member.department}
@@ -168,17 +207,21 @@ export default function Teams() {
                 <div className="space-y-4">
                   <div>
                     <div className="flex items-center justify-between text-sm mb-2">
-                      <span className="text-gray-600 font-medium">Performance</span>
-                      <span className="font-bold text-gray-800">{member.performance}%</span>
+                      <span className="text-gray-600 font-medium">
+                        Performance
+                      </span>
+                      <span className="font-bold text-gray-800">
+                        {member.performance}%
+                      </span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-3">
                       <div
                         className={`h-3 rounded-full transition-all duration-500 ${
-                          member.performance >= 90 
-                            ? 'bg-gradient-to-r from-green-400 to-green-500' 
-                            : member.performance >= 80 
-                            ? 'bg-gradient-to-r from-blue-400 to-blue-500'
-                            : 'bg-gradient-to-r from-orange-400 to-orange-500'
+                          member.performance >= 90
+                            ? "bg-gradient-to-r from-green-400 to-green-500"
+                            : member.performance >= 80
+                              ? "bg-gradient-to-r from-blue-400 to-blue-500"
+                              : "bg-gradient-to-r from-orange-400 to-orange-500"
                         }`}
                         style={{ width: `${member.performance}%` }}
                       />
@@ -187,31 +230,43 @@ export default function Teams() {
 
                   <div className="grid grid-cols-2 gap-3 text-sm">
                     <div className="text-center p-3 bg-blue-50 rounded-lg">
-                      <p className="font-bold text-blue-800 text-lg">{member.clientsManaged}</p>
+                      <p className="font-bold text-blue-800 text-lg">
+                        {member.clientsManaged}
+                      </p>
                       <p className="text-gray-600">Clients</p>
                     </div>
                     <div className="text-center p-3 bg-green-50 rounded-lg">
-                      <p className="font-bold text-green-800 text-lg">{member.currentTasks}</p>
+                      <p className="font-bold text-green-800 text-lg">
+                        {member.currentTasks}
+                      </p>
                       <p className="text-gray-600">Tasks</p>
                     </div>
                   </div>
 
                   <div>
                     <div className="flex items-center justify-between text-sm mb-2">
-                      <span className="text-gray-600 font-medium">Weekly Target</span>
-                      <span className="font-bold">{member.completedTarget}/{member.weeklyTarget}</span>
+                      <span className="text-gray-600 font-medium">
+                        Weekly Target
+                      </span>
+                      <span className="font-bold">
+                        {member.completedTarget}/{member.weeklyTarget}
+                      </span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div
                         className="bg-gradient-to-r from-blue-400 to-blue-500 h-2 rounded-full transition-all duration-500"
-                        style={{ width: `${(member.completedTarget / member.weeklyTarget) * 100}%` }}
+                        style={{
+                          width: `${(member.completedTarget / member.weeklyTarget) * 100}%`,
+                        }}
                       />
                     </div>
                   </div>
 
                   <div className="flex items-center justify-between text-sm pt-3 border-t border-gray-100">
                     <span className="text-gray-500">Last active:</span>
-                    <span className="text-gray-700 font-medium">{member.lastActivity}</span>
+                    <span className="text-gray-700 font-medium">
+                      {member.lastActivity}
+                    </span>
                   </div>
 
                   {/* Performance badges */}
@@ -229,7 +284,6 @@ export default function Teams() {
                       </div>
                     )}
                   </div>
-
                 </div>
               </div>
             ))}
@@ -238,7 +292,9 @@ export default function Teams() {
           {/* Created Teams Section */}
           {createdTeams.length > 0 && (
             <div className="mt-8 pt-8 border-t border-gray-100">
-              <h3 className="text-lg font-semibold mb-4 text-dark-blue">Project Teams</h3>
+              <h3 className="text-lg font-semibold mb-4 text-dark-blue">
+                Project Teams
+              </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {createdTeams.map((team) => (
                   <div
@@ -246,7 +302,9 @@ export default function Teams() {
                     className="p-4 rounded-lg bg-gradient-to-br from-blue-50 to-purple-50 border border-blue-200 hover:shadow-lg transition-all duration-300"
                   >
                     <div className="flex items-center justify-between mb-3">
-                      <h4 className="font-semibold text-gray-800 text-sm">{team.name}</h4>
+                      <h4 className="font-semibold text-gray-800 text-sm">
+                        {team.name}
+                      </h4>
                       <Badge className="bg-blue-100 text-blue-700 border-blue-200 text-xs">
                         {team.activityType}
                       </Badge>
@@ -280,41 +338,65 @@ export default function Teams() {
 
           {/* Team summary stats */}
           <div className="mt-8 pt-8 border-t border-gray-100">
-            <h3 className="text-lg font-semibold mb-4 text-dark-blue">Team Performance Summary</h3>
+            <h3 className="text-lg font-semibold mb-4 text-dark-blue">
+              Team Performance Summary
+            </h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               <div className="text-center p-6 bg-blue-50 rounded-xl border border-blue-100">
                 <div className="flex items-center justify-center mb-3">
                   <Users className="h-8 w-8 text-blue-600" />
                 </div>
-                <p className="text-3xl font-bold text-blue-800">{teamMembers.length}</p>
-                <p className="text-sm text-gray-600 font-medium">Team Members</p>
+                <p className="text-3xl font-bold text-blue-800">
+                  {teamMembers.length}
+                </p>
+                <p className="text-sm text-gray-600 font-medium">
+                  Team Members
+                </p>
               </div>
               <div className="text-center p-6 bg-green-50 rounded-xl border border-green-100">
                 <div className="flex items-center justify-center mb-3">
                   <Zap className="h-8 w-8 text-green-600" />
                 </div>
                 <p className="text-3xl font-bold text-green-800">
-                  {Math.round(teamMembers.reduce((acc, member) => acc + member.performance, 0) / teamMembers.length)}%
+                  {Math.round(
+                    teamMembers.reduce(
+                      (acc, member) => acc + member.performance,
+                      0,
+                    ) / teamMembers.length,
+                  )}
+                  %
                 </p>
-                <p className="text-sm text-gray-600 font-medium">Avg Performance</p>
+                <p className="text-sm text-gray-600 font-medium">
+                  Avg Performance
+                </p>
               </div>
               <div className="text-center p-6 bg-purple-50 rounded-xl border border-purple-100">
                 <div className="flex items-center justify-center mb-3">
                   <Target className="h-8 w-8 text-purple-600" />
                 </div>
                 <p className="text-3xl font-bold text-purple-800">
-                  {teamMembers.reduce((acc, member) => acc + member.clientsManaged, 0)}
+                  {teamMembers.reduce(
+                    (acc, member) => acc + member.clientsManaged,
+                    0,
+                  )}
                 </p>
-                <p className="text-sm text-gray-600 font-medium">Total Clients</p>
+                <p className="text-sm text-gray-600 font-medium">
+                  Total Clients
+                </p>
               </div>
               <div className="text-center p-6 bg-orange-50 rounded-xl border border-orange-100">
                 <div className="flex items-center justify-center mb-3">
                   <CheckCircle className="h-8 w-8 text-orange-600" />
                 </div>
                 <p className="text-3xl font-bold text-orange-800">
-                  {teamMembers.reduce((acc, member) => acc + member.currentTasks, 0)}
+                  {teamMembers.reduce(
+                    (acc, member) => acc + member.currentTasks,
+                    0,
+                  )}
                 </p>
-                <p className="text-sm text-gray-600 font-medium">Active Tasks</p>
+                <p className="text-sm text-gray-600 font-medium">
+                  Active Tasks
+                </p>
               </div>
             </div>
           </div>
@@ -322,21 +404,29 @@ export default function Teams() {
           {/* Current user highlight */}
           {user && (
             <div className="mt-8 pt-8 border-t border-gray-100">
-              <h3 className="text-lg font-semibold mb-4 text-dark-blue">Your Profile</h3>
+              <h3 className="text-lg font-semibold mb-4 text-dark-blue">
+                Your Profile
+              </h3>
               <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-xl border border-blue-200">
                 <div className="flex items-center space-x-4">
-                  <div className={`w-16 h-16 rounded-full bg-gradient-to-br ${user.bgColor || 'from-blue-500 to-blue-600'} flex items-center justify-center text-white font-bold text-lg shadow-lg`}>
+                  <div
+                    className={`w-16 h-16 rounded-full bg-gradient-to-br ${user.bgColor || "from-blue-500 to-blue-600"} flex items-center justify-center text-white font-bold text-lg shadow-lg`}
+                  >
                     {user.avatar}
                   </div>
                   <div className="flex-1">
-                    <h4 className="text-xl font-bold text-gray-800">{user.name}</h4>
+                    <h4 className="text-xl font-bold text-gray-800">
+                      {user.name}
+                    </h4>
                     <p className="text-blue-600 font-medium">{user.role}</p>
                     <div className="flex items-center space-x-2 mt-2">
-                      <Badge className={`${
-                        user.department === 'Sales' 
-                          ? 'bg-blue-100 text-blue-700 border-blue-200' 
-                          : 'bg-purple-100 text-purple-700 border-purple-200'
-                      }`}>
+                      <Badge
+                        className={`${
+                          user.department === "Sales"
+                            ? "bg-blue-100 text-blue-700 border-blue-200"
+                            : "bg-purple-100 text-purple-700 border-purple-200"
+                        }`}
+                      >
                         {user.department}
                       </Badge>
                       {isManager() && (
