@@ -866,7 +866,7 @@ export default function Organization() {
                           checked={!!formData.premiumSupport}
                           onChange={(e) => setFormData({ ...formData, premiumSupport: e.target.checked })}
                         />
-                        <Label htmlFor="premiumSupport">Premium Support</Label>
+                        <Label htmlFor="premiumSupport">Premium</Label>
                       </div>
 
                       <div className="space-y-2">
