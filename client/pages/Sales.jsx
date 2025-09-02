@@ -957,11 +957,6 @@ export default function Sales() {
         </div>
         <div className="flex items-center space-x-4">
           <Dialog open={isNewOpen} onOpenChange={setIsNewOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-                <UserPlus className="h-4 w-4 mr-2" /> Add Client
-              </Button>
-            </DialogTrigger>
             <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Add Client</DialogTitle>
