@@ -440,7 +440,7 @@ export default function Dashboard() {
             >
               <Link to="/organization">
                 <Building className="h-6 w-6" />
-                <span className="text-sm font-medium">View Organizations</span>
+                <span className="text-sm font-medium">{user?.department === 'Sales' ? 'Add Organization' : 'View Organizations'}</span>
               </Link>
             </Button>
             <Button
