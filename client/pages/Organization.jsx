@@ -321,44 +321,48 @@ export default function Organization() {
     localStorage.setItem('organizationData', JSON.stringify(updatedOrganizations));
     window.dispatchEvent(new Event('organizationDataUpdated'));
 
-    // Upsert matching sales lead (LEAD-ORG-{id}) and keep fields in sync
+    // Upsert matching sales lead ONLY for active phases
     try {
-      const leadId = `LEAD-ORG-${newOrganization.id}`;
-      const savedLeads = localStorage.getItem('sales_leads');
-      const leads = savedLeads ? JSON.parse(savedLeads) : [];
-      const idx = Array.isArray(leads) ? leads.findIndex(l => l.id === leadId) : -1;
-      const contactName = [newOrganization.contactPerson.firstName, newOrganization.contactPerson.surname].filter(Boolean).join(' ');
-      const contact = contactName || '';
-      const contacts = contact ? [{ name: contact, role: newOrganization.contactPerson.role || 'Primary', phone: newOrganization.contactPerson.phone || newOrganization.phone || '', email: newOrganization.email || '' }] : [];
-      const stage = newOrganization.phase;
-      const baseLead = {
-        id: leadId,
-        name: newOrganization.organizationName,
-        contacts,
-        contact,
-        phone: newOrganization.phone || contacts[0]?.phone || '',
-        email: newOrganization.email || contacts[0]?.email || '',
-        value: 0,
-        probability: 10,
-        stage,
-        source: 'Organization',
-        region: newOrganization.region || '',
-        product: '',
-        assignee: '',
-        team: Array.isArray(newOrganization.responsibleMembers) ? newOrganization.responsibleMembers : [],
-        created: new Date().toISOString().split('T')[0],
-        nextAction: '',
-        status: 'Cold',
-        timeSpent: 0,
-        lastActivity: new Date().toISOString().split('T')[0]
-      };
-      if (idx === -1) {
-        localStorage.setItem('sales_leads', JSON.stringify([baseLead, ...leads]));
-      } else {
-        leads[idx] = { ...baseLead, ...leads[idx], name: baseLead.name, stage: baseLead.stage, team: baseLead.team, contacts: baseLead.contacts, contact: baseLead.contact, phone: baseLead.phone, email: baseLead.email };
-        localStorage.setItem('sales_leads', JSON.stringify(leads));
+      const active = ["first contact","interested","offer sent","accepted","contract signed","implementation"];
+      const phaseKey = String(newOrganization.phase || "").toLowerCase();
+      if (active.includes(phaseKey)) {
+        const leadId = `LEAD-ORG-${newOrganization.id}`;
+        const savedLeads = localStorage.getItem('sales_leads');
+        const leads = savedLeads ? JSON.parse(savedLeads) : [];
+        const idx = Array.isArray(leads) ? leads.findIndex(l => l.id === leadId) : -1;
+        const contactName = [newOrganization.contactPerson.firstName, newOrganization.contactPerson.surname].filter(Boolean).join(' ');
+        const contact = contactName || '';
+        const contacts = contact ? [{ name: contact, role: newOrganization.contactPerson.role || 'Primary', phone: newOrganization.contactPerson.phone || newOrganization.phone || '', email: newOrganization.email || '' }] : [];
+        const stage = newOrganization.phase;
+        const baseLead = {
+          id: leadId,
+          name: newOrganization.organizationName,
+          contacts,
+          contact,
+          phone: newOrganization.phone || contacts[0]?.phone || '',
+          email: newOrganization.email || contacts[0]?.email || '',
+          value: 0,
+          probability: 10,
+          stage,
+          source: 'Organization',
+          region: newOrganization.region || '',
+          product: '',
+          assignee: '',
+          team: Array.isArray(newOrganization.responsibleMembers) ? newOrganization.responsibleMembers : [],
+          created: new Date().toISOString().split('T')[0],
+          nextAction: '',
+          status: 'Cold',
+          timeSpent: 0,
+          lastActivity: new Date().toISOString().split('T')[0]
+        };
+        if (idx === -1) {
+          localStorage.setItem('sales_leads', JSON.stringify([baseLead, ...leads]));
+        } else {
+          leads[idx] = { ...baseLead, ...leads[idx], name: baseLead.name, stage: baseLead.stage, team: baseLead.team, contacts: baseLead.contacts, contact: baseLead.contact, phone: baseLead.phone, email: baseLead.email };
+          localStorage.setItem('sales_leads', JSON.stringify(leads));
+        }
+        window.dispatchEvent(new Event('salesLeadsUpdated'));
       }
-      window.dispatchEvent(new Event('salesLeadsUpdated'));
     } catch {}
 
     setIsAddDialogOpen(false);
@@ -470,30 +474,39 @@ export default function Organization() {
     localStorage.setItem('organizationData', JSON.stringify(updatedOrganizations));
     window.dispatchEvent(new Event('organizationDataUpdated'));
 
-    // Upsert/update corresponding sales lead with phase/team/contact sync
+    // Sync corresponding sales lead: add/update for active phases, remove otherwise
     try {
+      const active = ["first contact","interested","offer sent","accepted","contract signed","implementation"];
+      const phaseKey = String(updatedOrganization.phase || "").toLowerCase();
       const leadId = `LEAD-ORG-${updatedOrganization.id}`;
       const savedLeads = localStorage.getItem('sales_leads');
       const leads = savedLeads ? JSON.parse(savedLeads) : [];
       const idx = Array.isArray(leads) ? leads.findIndex(l => l.id === leadId) : -1;
-      const contactName = [updatedOrganization.contactPerson.firstName, updatedOrganization.contactPerson.surname].filter(Boolean).join(' ');
-      const contact = contactName || '';
-      const contacts = contact ? [{ name: contact, role: updatedOrganization.contactPerson.role || 'Primary', phone: updatedOrganization.contactPerson.phone || updatedOrganization.phone || '', email: updatedOrganization.email || '' }] : [];
-      const patch = {
-        id: leadId,
-        name: updatedOrganization.organizationName,
-        stage: updatedOrganization.phase,
-        team: Array.isArray(updatedOrganization.responsibleMembers) ? updatedOrganization.responsibleMembers : [],
-        contacts,
-        contact,
-        phone: updatedOrganization.phone || contacts[0]?.phone || '',
-        email: updatedOrganization.email || contacts[0]?.email || '',
-      };
-      if (idx === -1) {
-        localStorage.setItem('sales_leads', JSON.stringify([patch, ...leads]));
+      if (active.includes(phaseKey)) {
+        const contactName = [updatedOrganization.contactPerson.firstName, updatedOrganization.contactPerson.surname].filter(Boolean).join(' ');
+        const contact = contactName || '';
+        const contacts = contact ? [{ name: contact, role: updatedOrganization.contactPerson.role || 'Primary', phone: updatedOrganization.contactPerson.phone || updatedOrganization.phone || '', email: updatedOrganization.email || '' }] : [];
+        const patch = {
+          id: leadId,
+          name: updatedOrganization.organizationName,
+          stage: updatedOrganization.phase,
+          team: Array.isArray(updatedOrganization.responsibleMembers) ? updatedOrganization.responsibleMembers : [],
+          contacts,
+          contact,
+          phone: updatedOrganization.phone || contacts[0]?.phone || '',
+          email: updatedOrganization.email || contacts[0]?.email || '',
+        };
+        if (idx === -1) {
+          localStorage.setItem('sales_leads', JSON.stringify([patch, ...leads]));
+        } else {
+          leads[idx] = { ...leads[idx], ...patch };
+          localStorage.setItem('sales_leads', JSON.stringify(leads));
+        }
       } else {
-        leads[idx] = { ...leads[idx], ...patch };
-        localStorage.setItem('sales_leads', JSON.stringify(leads));
+        if (idx !== -1) {
+          const next = leads.filter(l => l.id !== leadId);
+          localStorage.setItem('sales_leads', JSON.stringify(next));
+        }
       }
       window.dispatchEvent(new Event('salesLeadsUpdated'));
     } catch {}
