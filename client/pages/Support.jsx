@@ -359,6 +359,23 @@ export default function Support() {
     } catch {}
   };
 
+  const handleBulkDeleteFilteredTickets = () => {
+    const count = filteredSupportActivities.length;
+    if (count === 0) return;
+    const should = window.confirm(`Delete ${count} tickets matching current filters?`);
+    if (!should) return;
+    try {
+      const saved = localStorage.getItem('activitiesList');
+      const list = saved ? JSON.parse(saved) : [];
+      const ids = new Set(filteredSupportActivities.map(a => a.id));
+      const updated = Array.isArray(list) ? list.filter(a => !ids.has(a.id)) : [];
+      localStorage.setItem('activitiesList', JSON.stringify(updated));
+      window.dispatchEvent(new Event('activitiesListUpdated'));
+      setSelectedIds(prev => prev.filter(id => !ids.has(id)));
+      setSelectionMode(false);
+    } catch {}
+  };
+
 
   return (
     <div className="p-6 space-y-6 bg-gradient-to-br from-blue-50 via-white to-blue-100 min-h-screen">
@@ -549,6 +566,16 @@ export default function Support() {
                 disabled={!selectionMode || selectedIds.length === 0}
               >
                 Delete Selected {selectedIds.length > 0 ? `(${selectedIds.length})` : ""}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleBulkDeleteFilteredTickets}
+                className="border-red-200 text-red-700 hover:bg-red-50"
+                disabled={filteredSupportActivities.length === 0}
+                title="Delete all tickets that match current filters"
+              >
+                Delete Filtered {filteredSupportActivities.length > 0 ? `(${filteredSupportActivities.length})` : ""}
               </Button>
             </div>
           </div>
