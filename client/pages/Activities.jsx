@@ -1,12 +1,32 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import {
   Plus,
   Search,
@@ -32,7 +52,7 @@ import {
   Eye,
   Upload,
   MapPin,
-  Trash2
+  Trash2,
 } from "lucide-react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -54,15 +74,16 @@ const activities = [
     reminderDate: "2024-01-14",
     nextStep: "Follow-up call on contract renewal",
     nextStepDate: "2024-01-25",
-    notes: "Resolved ticketing system issue. Client very satisfied with response time.",
+    notes:
+      "Resolved ticketing system issue. Client very satisfied with response time.",
     attachments: ["call_notes.pdf", "solution_guide.docx"],
     costPerActivity: 50,
     premiumSupport: true,
     activityLog: [
       { user: "Ana Marić", action: "Created", timestamp: "2024-01-15 09:00" },
-      { user: "Ana Marić", action: "Completed", timestamp: "2024-01-15 15:00" }
+      { user: "Ana Marić", action: "Completed", timestamp: "2024-01-15 15:00" },
     ],
-    priority: "High"
+    priority: "High",
   },
   {
     id: 2,
@@ -78,15 +99,24 @@ const activities = [
     reminderDate: "2024-01-17",
     nextStep: "Send detailed proposal with pricing",
     nextStepDate: "2024-01-20",
-    notes: "Following up on contract proposal. Client interested in premium features.",
+    notes:
+      "Following up on contract proposal. Client interested in premium features.",
     attachments: ["proposal_draft.pdf"],
     costPerActivity: 0,
     premiumSupport: false,
     activityLog: [
-      { user: "Marko Petrović", action: "Created", timestamp: "2024-01-15 08:30" },
-      { user: "Marko Petrović", action: "Updated", timestamp: "2024-01-15 11:00" }
+      {
+        user: "Marko Petrović",
+        action: "Created",
+        timestamp: "2024-01-15 08:30",
+      },
+      {
+        user: "Marko Petrović",
+        action: "Updated",
+        timestamp: "2024-01-15 11:00",
+      },
     ],
-    priority: "Medium"
+    priority: "Medium",
   },
   {
     id: 3,
@@ -107,9 +137,9 @@ const activities = [
     costPerActivity: 120,
     premiumSupport: false,
     activityLog: [
-      { user: "Ana Marić", action: "Created", timestamp: "2024-01-10 14:00" }
+      { user: "Ana Marić", action: "Created", timestamp: "2024-01-10 14:00" },
     ],
-    priority: "High"
+    priority: "High",
   },
   {
     id: 4,
@@ -130,10 +160,10 @@ const activities = [
     costPerActivity: 25,
     premiumSupport: true,
     activityLog: [
-      { user: "Petra Babić", action: "Created", timestamp: "2024-01-12 10:00" }
+      { user: "Petra Babić", action: "Created", timestamp: "2024-01-12 10:00" },
     ],
-    priority: "Medium"
-  }
+    priority: "Medium",
+  },
 ];
 
 // Client address lookup for location functionality
@@ -145,94 +175,151 @@ const clientAddresses = {
   "Pula Municipality": "Forum 3, Pula, Croatia",
   "Dubrovnik Tourism Board": "Stradun 1, Dubrovnik, Croatia",
   "Karlovac County": "Petra Zrinskog 1, Karlovac, Croatia",
-  "Zadar Port Authority": "Liburnska obala 6, Zadar, Croatia"
+  "Zadar Port Authority": "Liburnska obala 6, Zadar, Croatia",
 };
 
 // Enhanced filter and reference data
-const activityTypes = ["All Types", "Call", "Email", "Online Meeting", "In-person Meeting"];
+const activityTypes = [
+  "All Types",
+  "Call",
+  "Email",
+  "Online Meeting",
+  "In-person Meeting",
+];
 const categories = ["All Categories", "Sales", "Support"];
-const supportTicketCategories = ["All Categories", "Bug", "Question", "Feature", "Training"];
+const supportTicketCategories = [
+  "All Categories",
+  "Bug",
+  "Question",
+  "Feature",
+  "Training",
+];
 const statuses = ["All Statuses", "To Do", "In Progress", "Done", "Resolved"];
-const teamMembers = ["All Members", "Ana Marić", "Marko Petrović", "Petra Babić", "Luka Novak", "Sofia Antić"];
+const teamMembers = [
+  "All Members",
+  "Ana Marić",
+  "Marko Petrović",
+  "Petra Babić",
+  "Luka Novak",
+  "Sofia Antić",
+];
 const priorities = ["All Priorities", "Low", "Medium", "High", "Urgent"];
-const defaultClients = ["All Clients", "Zagreb Municipality", "Sports Club Dinamo", "Split City Council", "Tech Solutions Ltd"];
+const defaultClients = [
+  "All Clients",
+  "Zagreb Municipality",
+  "Sports Club Dinamo",
+  "Split City Council",
+  "Tech Solutions Ltd",
+];
 
 const getStatusColor = (status) => {
   switch (status) {
-    case "To Do": return "bg-blue-100 text-blue-800 border-blue-200";
-    case "In Progress": return "bg-yellow-100 text-yellow-800 border-yellow-200";
-    case "Done": return "bg-green-100 text-green-800 border-green-200";
-    case "Resolved": return "bg-emerald-100 text-emerald-800 border-emerald-200";
-    default: return "bg-gray-100 text-gray-800 border-gray-200";
+    case "To Do":
+      return "bg-blue-100 text-blue-800 border-blue-200";
+    case "In Progress":
+      return "bg-yellow-100 text-yellow-800 border-yellow-200";
+    case "Done":
+      return "bg-green-100 text-green-800 border-green-200";
+    case "Resolved":
+      return "bg-emerald-100 text-emerald-800 border-emerald-200";
+    default:
+      return "bg-gray-100 text-gray-800 border-gray-200";
   }
 };
 
 const getPriorityColor = (priority) => {
   switch (priority) {
-    case "Low": return "bg-green-100 text-green-800 border-green-200";
-    case "Medium": return "bg-yellow-100 text-yellow-800 border-yellow-200";
-    case "High": return "bg-orange-100 text-orange-800 border-orange-200";
-    case "Urgent": return "bg-red-100 text-red-800 border-red-200";
-    default: return "bg-gray-100 text-gray-800 border-gray-200";
+    case "Low":
+      return "bg-green-100 text-green-800 border-green-200";
+    case "Medium":
+      return "bg-yellow-100 text-yellow-800 border-yellow-200";
+    case "High":
+      return "bg-orange-100 text-orange-800 border-orange-200";
+    case "Urgent":
+      return "bg-red-100 text-red-800 border-red-200";
+    default:
+      return "bg-gray-100 text-gray-800 border-gray-200";
   }
 };
 
 const getCategoryColor = (category) => {
   switch (category) {
-    case "Sales": return "bg-blue-100 text-blue-800 border-blue-200";
-    case "Support": return "bg-purple-100 text-purple-800 border-purple-200";
-    default: return "bg-gray-100 text-gray-800 border-gray-200";
+    case "Sales":
+      return "bg-blue-100 text-blue-800 border-blue-200";
+    case "Support":
+      return "bg-purple-100 text-purple-800 border-purple-200";
+    default:
+      return "bg-gray-100 text-gray-800 border-gray-200";
   }
 };
 
 const getCategoryIconBackground = (category) => {
   switch (category) {
-    case "Sales": return "bg-gradient-to-br from-blue-50 to-blue-200";
-    case "Support": return "bg-gradient-to-br from-purple-50 to-purple-200";
-    default: return "bg-gradient-to-br from-gray-50 to-gray-200";
+    case "Sales":
+      return "bg-gradient-to-br from-blue-50 to-blue-200";
+    case "Support":
+      return "bg-gradient-to-br from-purple-50 to-purple-200";
+    default:
+      return "bg-gradient-to-br from-gray-50 to-gray-200";
   }
 };
 
 const getTicketTypeColor = (ticketType) => {
   switch (ticketType) {
-    case "Bug": return "bg-red-100 text-red-800 border-red-200";
-    case "Question": return "bg-blue-100 text-blue-800 border-blue-200";
-    case "Feature": return "bg-green-100 text-green-800 border-green-200";
-    case "Enhancement": return "bg-purple-100 text-purple-800 border-purple-200";
-    default: return "bg-gray-100 text-gray-800 border-gray-200";
+    case "Bug":
+      return "bg-red-100 text-red-800 border-red-200";
+    case "Question":
+      return "bg-blue-100 text-blue-800 border-blue-200";
+    case "Feature":
+      return "bg-green-100 text-green-800 border-green-200";
+    case "Enhancement":
+      return "bg-purple-100 text-purple-800 border-purple-200";
+    default:
+      return "bg-gray-100 text-gray-800 border-gray-200";
   }
 };
 
 const getActivityTypeIcon = (type) => {
   switch (type) {
-    case "Call": return <Phone className="h-4 w-4" />;
-    case "Email": return <Mail className="h-4 w-4" />;
-    case "Online Meeting": return <Video className="h-4 w-4" />;
-    case "In-person Meeting": return <Users className="h-4 w-4" />;
-    default: return <User className="h-4 w-4" />;
+    case "Call":
+      return <Phone className="h-4 w-4" />;
+    case "Email":
+      return <Mail className="h-4 w-4" />;
+    case "Online Meeting":
+      return <Video className="h-4 w-4" />;
+    case "In-person Meeting":
+      return <Users className="h-4 w-4" />;
+    default:
+      return <User className="h-4 w-4" />;
   }
 };
 
 const getTicketTypeIcon = (type) => {
   switch (type) {
-    case "Bug": return <Bug className="h-3 w-3" />;
-    case "Question": return <HelpCircle className="h-3 w-3" />;
-    case "Feature": return <Star className="h-3 w-3" />;
-    case "Enhancement": return <Zap className="h-3 w-3" />;
-    default: return <FileText className="h-3 w-3" />;
+    case "Bug":
+      return <Bug className="h-3 w-3" />;
+    case "Question":
+      return <HelpCircle className="h-3 w-3" />;
+    case "Feature":
+      return <Star className="h-3 w-3" />;
+    case "Enhancement":
+      return <Zap className="h-3 w-3" />;
+    default:
+      return <FileText className="h-3 w-3" />;
   }
 };
-
 
 export default function Activities() {
   // Initialize activities from localStorage or use default activities
   const [activitiesList, setActivitiesList] = useState(() => {
-    const savedActivities = localStorage.getItem('activitiesList');
+    const savedActivities = localStorage.getItem("activitiesList");
     if (savedActivities) {
       const parsed = JSON.parse(savedActivities);
       // Merge saved activities with default activities, avoiding duplicates
-      const existingIds = parsed.map(a => a.id);
-      const newDefaultActivities = activities.filter(a => !existingIds.includes(a.id));
+      const existingIds = parsed.map((a) => a.id);
+      const newDefaultActivities = activities.filter(
+        (a) => !existingIds.includes(a.id),
+      );
       return [...parsed, ...newDefaultActivities];
     }
     return activities;
@@ -249,11 +336,16 @@ export default function Activities() {
   });
   const getSupportPriorityColor = (p) => {
     switch (p) {
-      case "urgent": return "bg-red-100 text-red-800 border-red-200";
-      case "high": return "bg-orange-100 text-orange-800 border-orange-200";
-      case "medium": return "bg-yellow-100 text-yellow-800 border-yellow-200";
-      case "low": return "bg-green-100 text-green-800 border-green-200";
-      default: return "";
+      case "urgent":
+        return "bg-red-100 text-red-800 border-red-200";
+      case "high":
+        return "bg-orange-100 text-orange-800 border-orange-200";
+      case "medium":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      case "low":
+        return "bg-green-100 text-green-800 border-green-200";
+      default:
+        return "";
     }
   };
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
@@ -273,28 +365,42 @@ export default function Activities() {
   const [selectedPremiumClient, setSelectedPremiumClient] = useState("All");
   const [isFiltersOpen, setIsFiltersOpen] = useState(true);
 
-
   // Dynamic clients list based on organizations + activities
   const clients = React.useMemo(() => {
-    const stored = localStorage.getItem('organizationData');
-    const orgNames = stored ? JSON.parse(stored).map(o => o.organizationName) : [];
-    const activityClients = [...new Set(activitiesList.map(activity => activity.linkedClient))];
+    const stored = localStorage.getItem("organizationData");
+    const orgNames = stored
+      ? JSON.parse(stored).map((o) => o.organizationName)
+      : [];
+    const activityClients = [
+      ...new Set(activitiesList.map((activity) => activity.linkedClient)),
+    ];
     let leadNames = [];
     try {
-      const leadsSaved = localStorage.getItem('sales_leads');
+      const leadsSaved = localStorage.getItem("sales_leads");
       const leads = leadsSaved ? JSON.parse(leadsSaved) : [];
-      leadNames = Array.isArray(leads) ? leads.map(l => l?.name).filter(Boolean) : [];
+      leadNames = Array.isArray(leads)
+        ? leads.map((l) => l?.name).filter(Boolean)
+        : [];
     } catch {}
-    const allClients = [...new Set([...defaultClients, ...orgNames, ...activityClients, ...leadNames])];
-    return allClients.filter(client => client !== "All Clients").sort().concat(["All Clients"]).reverse();
+    const allClients = [
+      ...new Set([
+        ...defaultClients,
+        ...orgNames,
+        ...activityClients,
+        ...leadNames,
+      ]),
+    ];
+    return allClients
+      .filter((client) => client !== "All Clients")
+      .sort()
+      .concat(["All Clients"])
+      .reverse();
   }, [activitiesList]);
 
   const organizationsList = React.useMemo(() => {
-    const stored = localStorage.getItem('organizationData');
+    const stored = localStorage.getItem("organizationData");
     return stored ? JSON.parse(stored) : [];
   }, []);
-
-
 
   // Form state for new activity
   const [newActivity, setNewActivity] = useState({
@@ -302,7 +408,7 @@ export default function Activities() {
     category: "Support", // Auto-set based on user role
     linkedClient: "",
     unitType: "Government", // Changed from clientType
-    date: new Date().toISOString().split('T')[0], // Current date
+    date: new Date().toISOString().split("T")[0], // Current date
     time: new Date().toTimeString().slice(0, 5), // Current time HH:MM
     responsible: [], // Changed to array for multiple selection
     status: "To Do",
@@ -315,7 +421,7 @@ export default function Activities() {
     costPerActivity: 0,
     ticketType: "Question",
     premiumSupport: false,
-    priority: "Medium"
+    priority: "Medium",
     // Removed isTicket
   });
 
@@ -338,84 +444,121 @@ export default function Activities() {
     attachments: [],
     costPerActivity: 0,
     premiumSupport: false,
-    priority: ""
+    priority: "",
   });
 
-  const [editTicketSupport, setEditTicketSupport] = useState({ id: '', title: '', client: '', priority: 'medium', category: 'Bug', assignees: [], description: '', premium: false });
+  const [editTicketSupport, setEditTicketSupport] = useState({
+    id: "",
+    title: "",
+    client: "",
+    priority: "medium",
+    category: "Bug",
+    assignees: [],
+    description: "",
+    premium: false,
+  });
   const { user, getAllUsers } = useAuth();
 
   React.useEffect(() => {
-    if (user?.department === 'Support' && selectedType === "All Types") {
+    if (user?.department === "Support" && selectedType === "All Types") {
       setSelectedType("All Categories");
       setSelectedPremiumClient((prev) => prev || "All");
     }
-    if (user?.department !== 'Support' && selectedType === "All Categories") {
+    if (user?.department !== "Support" && selectedType === "All Categories") {
       setSelectedType("All Types");
     }
   }, [user?.department]);
 
   React.useEffect(() => {
     try {
-      const raw = localStorage.getItem('prefillNewActivityFromSales');
+      const raw = localStorage.getItem("prefillNewActivityFromSales");
       if (raw) {
         const data = JSON.parse(raw);
         let premium = false;
-        if (typeof data?.isPremium === 'boolean') premium = !!data.isPremium;
+        if (typeof data?.isPremium === "boolean") premium = !!data.isPremium;
         else {
           try {
-            const savedLeads = localStorage.getItem('sales_leads');
+            const savedLeads = localStorage.getItem("sales_leads");
             const leads = savedLeads ? JSON.parse(savedLeads) : [];
-            const match = Array.isArray(leads) ? leads.find(l => l?.name === data?.linkedClient) : null;
-            if (match && typeof match.isPremium === 'boolean') premium = !!match.isPremium;
+            const match = Array.isArray(leads)
+              ? leads.find((l) => l?.name === data?.linkedClient)
+              : null;
+            if (match && typeof match.isPremium === "boolean")
+              premium = !!match.isPremium;
             if (!premium) {
-              const savedOrgs = localStorage.getItem('organizationData');
+              const savedOrgs = localStorage.getItem("organizationData");
               const orgs = savedOrgs ? JSON.parse(savedOrgs) : [];
-              const org = Array.isArray(orgs) ? orgs.find(o => o?.organizationName === data?.linkedClient) : null;
-              if (org && typeof org.premiumSupport === 'boolean') premium = !!org.premiumSupport;
+              const org = Array.isArray(orgs)
+                ? orgs.find((o) => o?.organizationName === data?.linkedClient)
+                : null;
+              if (org && typeof org.premiumSupport === "boolean")
+                premium = !!org.premiumSupport;
             }
           } catch {}
         }
         setNewActivity((p) => ({
           ...p,
-          category: 'Sales',
+          category: "Sales",
           linkedClient: data?.linkedClient || p.linkedClient,
           unitType: data?.unitType || p.unitType,
           premiumSupport: premium,
         }));
         setIsDialogOpen(true);
-        localStorage.removeItem('prefillNewActivityFromSales');
+        localStorage.removeItem("prefillNewActivityFromSales");
       }
     } catch {}
   }, []);
 
   const availableMembersForNew = React.useMemo(() => {
-    const org = organizationsList.find(o => o.organizationName === newActivity.linkedClient);
-    const defaults = ["Ana Marić", "Marko Petrović", "Petra Babić", "Luka Novak", "Sofia Antić"];
+    const org = organizationsList.find(
+      (o) => o.organizationName === newActivity.linkedClient,
+    );
+    const defaults = [
+      "Ana Marić",
+      "Marko Petrović",
+      "Petra Babić",
+      "Luka Novak",
+      "Sofia Antić",
+    ];
     let allUsers = [];
     try {
-      allUsers = (getAllUsers?.() || []).map(u => u?.name).filter(Boolean);
+      allUsers = (getAllUsers?.() || []).map((u) => u?.name).filter(Boolean);
     } catch {}
     const base = allUsers.length ? allUsers : defaults;
-    const orgMembers = Array.isArray(org?.responsibleMembers) ? org.responsibleMembers : [];
+    const orgMembers = Array.isArray(org?.responsibleMembers)
+      ? org.responsibleMembers
+      : [];
     return Array.from(new Set([...(orgMembers || []), ...base]));
   }, [organizationsList, newActivity.linkedClient, getAllUsers]);
 
   const availableMembersForEdit = React.useMemo(() => {
-    const org = organizationsList.find(o => o.organizationName === editActivity.linkedClient);
-    const defaults = ["Ana Marić", "Marko Petrović", "Petra Babić", "Luka Novak", "Sofia Antić"];
+    const org = organizationsList.find(
+      (o) => o.organizationName === editActivity.linkedClient,
+    );
+    const defaults = [
+      "Ana Marić",
+      "Marko Petrović",
+      "Petra Babić",
+      "Luka Novak",
+      "Sofia Antić",
+    ];
     let allUsers = [];
     try {
-      allUsers = (getAllUsers?.() || []).map(u => u?.name).filter(Boolean);
+      allUsers = (getAllUsers?.() || []).map((u) => u?.name).filter(Boolean);
     } catch {}
     const base = allUsers.length ? allUsers : defaults;
-    const orgMembers = Array.isArray(org?.responsibleMembers) ? org.responsibleMembers : [];
+    const orgMembers = Array.isArray(org?.responsibleMembers)
+      ? org.responsibleMembers
+      : [];
     return Array.from(new Set([...(orgMembers || []), ...base]));
   }, [organizationsList, editActivity.linkedClient, getAllUsers]);
 
   // Role-based base filtering
   const supportMemberNames = React.useMemo(() => {
     try {
-      return (getAllUsers?.() || []).filter(u => u?.department === "Support").map(u => u.name);
+      return (getAllUsers?.() || [])
+        .filter((u) => u?.department === "Support")
+        .map((u) => u.name);
     } catch {
       return ["Petra Babić", "Sofia Antić"]; // fallback
     }
@@ -426,63 +569,91 @@ export default function Activities() {
   // Filtered activities
   const filteredActivities = roleFilteredActivities.filter((activity) => {
     const isSupport = user?.department === "Support";
-    const responsibleString = Array.isArray(activity.responsible) ? activity.responsible.join(", ") : activity.responsible;
-    const matchesSearch = activity.linkedClient.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         responsibleString.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         activity.notes.toLowerCase().includes(searchTerm.toLowerCase());
+    const responsibleString = Array.isArray(activity.responsible)
+      ? activity.responsible.join(", ")
+      : activity.responsible;
+    const matchesSearch =
+      activity.linkedClient.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      responsibleString.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      activity.notes.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesType = isSupport
-      ? (selectedType === "All Categories" || activity.ticketType === selectedType)
-      : (selectedType === "All Types" || activity.activityType === selectedType);
-    const matchesCategory = isSupport
-      ? true
-      : true;
+      ? selectedType === "All Categories" ||
+        activity.ticketType === selectedType
+      : selectedType === "All Types" || activity.activityType === selectedType;
+    const matchesCategory = isSupport ? true : true;
     const matchesPremium = isSupport
-      ? (selectedPremiumClient === "All" || activity.premiumSupport === (selectedPremiumClient === "Premium"))
+      ? selectedPremiumClient === "All" ||
+        activity.premiumSupport === (selectedPremiumClient === "Premium")
       : true;
-    const matchesStatus = selectedStatus === "All Statuses" || activity.status === selectedStatus;
-    const matchesMember = selectedMember === "All Members" || responsibleString.includes(selectedMember);
-    const matchesPriority = selectedPriority === "All Priorities" || activity.priority === selectedPriority;
-    const matchesClient = selectedClient === "All Clients" || activity.linkedClient === selectedClient;
+    const matchesStatus =
+      selectedStatus === "All Statuses" || activity.status === selectedStatus;
+    const matchesMember =
+      selectedMember === "All Members" ||
+      responsibleString.includes(selectedMember);
+    const matchesPriority =
+      selectedPriority === "All Priorities" ||
+      activity.priority === selectedPriority;
+    const matchesClient =
+      selectedClient === "All Clients" ||
+      activity.linkedClient === selectedClient;
     const matchesFromDate = !fromDate || activity.date >= fromDate;
     const matchesToDate = !toDate || activity.date <= toDate;
 
-    return matchesSearch && matchesType && matchesCategory && matchesPremium && matchesStatus &&
-           matchesMember && matchesPriority && matchesClient && matchesFromDate && matchesToDate;
+    return (
+      matchesSearch &&
+      matchesType &&
+      matchesCategory &&
+      matchesPremium &&
+      matchesStatus &&
+      matchesMember &&
+      matchesPriority &&
+      matchesClient &&
+      matchesFromDate &&
+      matchesToDate
+    );
   });
 
   const handleInputChange = (field, value) => {
-    setNewActivity(prev => ({
+    setNewActivity((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
   const handleAddActivity = () => {
-    if (!newActivity.activityType || !newActivity.linkedClient || !newActivity.date || !newActivity.time) {
+    if (
+      !newActivity.activityType ||
+      !newActivity.linkedClient ||
+      !newActivity.date ||
+      !newActivity.time
+    ) {
       alert("Please fill in all required fields");
       return;
     }
-
 
     const activity = {
       id: activitiesList.length + 1,
       ...newActivity,
       costPerActivity: parseFloat(newActivity.costPerActivity) || 0,
       activityLog: [
-        { user: newActivity.responsible, action: "Created", timestamp: new Date().toLocaleString() }
-      ]
+        {
+          user: newActivity.responsible,
+          action: "Created",
+          timestamp: new Date().toLocaleString(),
+        },
+      ],
     };
 
     const updatedActivities = [activity, ...activitiesList];
     setActivitiesList(updatedActivities);
-    localStorage.setItem('activitiesList', JSON.stringify(updatedActivities));
-    window.dispatchEvent(new Event('activitiesListUpdated'));
+    localStorage.setItem("activitiesList", JSON.stringify(updatedActivities));
+    window.dispatchEvent(new Event("activitiesListUpdated"));
     setNewActivity({
       activityType: "",
       category: "Support",
       linkedClient: "",
       unitType: "Government",
-      date: new Date().toISOString().split('T')[0],
+      date: new Date().toISOString().split("T")[0],
       time: new Date().toTimeString().slice(0, 5),
       responsible: [],
       status: "To Do",
@@ -494,7 +665,7 @@ export default function Activities() {
       attachments: [],
       costPerActivity: 0,
       premiumSupport: false,
-      priority: "Medium"
+      priority: "Medium",
     });
     setIsDialogOpen(false);
   };
@@ -506,14 +677,16 @@ export default function Activities() {
 
   React.useEffect(() => {
     try {
-      const pendingId = localStorage.getItem('openActivityId');
+      const pendingId = localStorage.getItem("openActivityId");
       if (pendingId) {
-        const act = (activitiesList || []).find(a => String(a.id) === String(pendingId));
+        const act = (activitiesList || []).find(
+          (a) => String(a.id) === String(pendingId),
+        );
         if (act) {
           setSelectedActivity(act);
           setIsViewDialogOpen(true);
         }
-        localStorage.removeItem('openActivityId');
+        localStorage.removeItem("openActivityId");
       }
     } catch {}
   }, [activitiesList]);
@@ -523,7 +696,7 @@ export default function Activities() {
     if (address) {
       const encodedAddress = encodeURIComponent(address);
       const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
-      window.open(googleMapsUrl, '_blank');
+      window.open(googleMapsUrl, "_blank");
     } else {
       alert("Address not available for this client");
     }
@@ -550,17 +723,21 @@ export default function Activities() {
       premiumSupport: activity.premiumSupport,
       priority: activity.priority,
       ticketType: activity.ticketType,
-      isTicket: activity.isTicket
+      isTicket: activity.isTicket,
     });
     if (activity?.isTicket || activity?.ticketType) {
       setEditTicketSupport({
         id: activity.id,
-        title: activity.notes || '',
-        client: activity.linkedClient || '',
-        priority: (activity.priority || 'Medium').toLowerCase(),
-        category: activity.ticketType || 'Bug',
-        assignees: Array.isArray(activity.responsible) ? activity.responsible : (activity.responsible ? [activity.responsible] : []),
-        description: activity.notes || '',
+        title: activity.notes || "",
+        client: activity.linkedClient || "",
+        priority: (activity.priority || "Medium").toLowerCase(),
+        category: activity.ticketType || "Bug",
+        assignees: Array.isArray(activity.responsible)
+          ? activity.responsible
+          : activity.responsible
+            ? [activity.responsible]
+            : [],
+        description: activity.notes || "",
         premium: !!activity.premiumSupport,
       });
     }
@@ -568,14 +745,19 @@ export default function Activities() {
   };
 
   const handleEditInputChange = (field, value) => {
-    setEditActivity(prev => ({
+    setEditActivity((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
   const handleUpdateActivity = () => {
-    if (!editActivity.activityType || !editActivity.linkedClient || !editActivity.date || !editActivity.time) {
+    if (
+      !editActivity.activityType ||
+      !editActivity.linkedClient ||
+      !editActivity.date ||
+      !editActivity.time
+    ) {
       alert("Please fill in all required fields");
       return;
     }
@@ -584,29 +766,49 @@ export default function Activities() {
       ...editActivity,
       costPerActivity: parseFloat(editActivity.costPerActivity) || 0,
       activityLog: [
-        ...activitiesList.find(a => a.id === editActivity.id)?.activityLog || [],
-        { user: editActivity.responsible, action: "Updated", timestamp: new Date().toLocaleString() }
-      ]
+        ...(activitiesList.find((a) => a.id === editActivity.id)?.activityLog ||
+          []),
+        {
+          user: editActivity.responsible,
+          action: "Updated",
+          timestamp: new Date().toLocaleString(),
+        },
+      ],
     };
 
-    const updatedActivitiesList = activitiesList.map(activity =>
-      activity.id === editActivity.id ? updatedActivity : activity
+    const updatedActivitiesList = activitiesList.map((activity) =>
+      activity.id === editActivity.id ? updatedActivity : activity,
     );
     setActivitiesList(updatedActivitiesList);
-    localStorage.setItem('activitiesList', JSON.stringify(updatedActivitiesList));
-    window.dispatchEvent(new Event('activitiesListUpdated'));
+    localStorage.setItem(
+      "activitiesList",
+      JSON.stringify(updatedActivitiesList),
+    );
+    window.dispatchEvent(new Event("activitiesListUpdated"));
 
     setIsEditDialogOpen(false);
     setIsViewDialogOpen(false); // Close view dialog too
   };
 
   const handleUpdateSupportTicket = () => {
-    if (!editTicketSupport.title || !editTicketSupport.client || !Array.isArray(editTicketSupport.assignees) || editTicketSupport.assignees.length === 0) {
-      alert('Please fill in title, client and at least one assignee');
+    if (
+      !editTicketSupport.title ||
+      !editTicketSupport.client ||
+      !Array.isArray(editTicketSupport.assignees) ||
+      editTicketSupport.assignees.length === 0
+    ) {
+      alert("Please fill in title, client and at least one assignee");
       return;
     }
-    const mapPriority = (p) => p === 'urgent' ? 'Urgent' : p === 'high' ? 'High' : p === 'low' ? 'Low' : 'Medium';
-    const updatedActivitiesList = activitiesList.map(a => {
+    const mapPriority = (p) =>
+      p === "urgent"
+        ? "Urgent"
+        : p === "high"
+          ? "High"
+          : p === "low"
+            ? "Low"
+            : "Medium";
+    const updatedActivitiesList = activitiesList.map((a) => {
       if (a.id !== editActivity.id) return a;
       return {
         ...a,
@@ -619,20 +821,29 @@ export default function Activities() {
         priority: mapPriority(editTicketSupport.priority),
         activityLog: [
           ...(a.activityLog || []),
-          { user: Array.isArray(editTicketSupport.assignees) ? editTicketSupport.assignees.join(', ') : '', action: 'Updated', timestamp: new Date().toLocaleString() }
-        ]
+          {
+            user: Array.isArray(editTicketSupport.assignees)
+              ? editTicketSupport.assignees.join(", ")
+              : "",
+            action: "Updated",
+            timestamp: new Date().toLocaleString(),
+          },
+        ],
       };
     });
     setActivitiesList(updatedActivitiesList);
-    localStorage.setItem('activitiesList', JSON.stringify(updatedActivitiesList));
-    window.dispatchEvent(new Event('activitiesListUpdated'));
+    localStorage.setItem(
+      "activitiesList",
+      JSON.stringify(updatedActivitiesList),
+    );
+    window.dispatchEvent(new Event("activitiesListUpdated"));
     setIsEditDialogOpen(false);
     setIsViewDialogOpen(false);
   };
 
   const resetFilters = () => {
     setSearchTerm("");
-    if (user?.department === 'Support') {
+    if (user?.department === "Support") {
       setSelectedType("All Categories");
       setSelectedPremiumClient("All");
     } else {
@@ -648,44 +859,57 @@ export default function Activities() {
   };
 
   const handleDeleteActivity = (id) => {
-    const updated = activitiesList.filter(a => a.id !== id);
+    const updated = activitiesList.filter((a) => a.id !== id);
     setActivitiesList(updated);
-    localStorage.setItem('activitiesList', JSON.stringify(updated));
-    window.dispatchEvent(new Event('activitiesListUpdated'));
+    localStorage.setItem("activitiesList", JSON.stringify(updated));
+    window.dispatchEvent(new Event("activitiesListUpdated"));
   };
 
   const handleBulkDeleteByClient = () => {
-    const targets = selectedClient && selectedClient !== "All Clients"
-      ? activitiesList.filter(a => a.linkedClient === selectedClient)
-      : filteredActivities;
+    const targets =
+      selectedClient && selectedClient !== "All Clients"
+        ? activitiesList.filter((a) => a.linkedClient === selectedClient)
+        : filteredActivities;
     if (!targets.length) return;
-    const label = selectedClient && selectedClient !== "All Clients" ? selectedClient : "all filtered activities";
-    const should = window.confirm(`Delete ${targets.length} activities for ${label}?`);
+    const label =
+      selectedClient && selectedClient !== "All Clients"
+        ? selectedClient
+        : "all filtered activities";
+    const should = window.confirm(
+      `Delete ${targets.length} activities for ${label}?`,
+    );
     if (!should) return;
-    const ids = new Set(targets.map(a => a.id));
-    const updated = activitiesList.filter(a => !ids.has(a.id));
+    const ids = new Set(targets.map((a) => a.id));
+    const updated = activitiesList.filter((a) => !ids.has(a.id));
     setActivitiesList(updated);
-    localStorage.setItem('activitiesList', JSON.stringify(updated));
-    window.dispatchEvent(new Event('activitiesListUpdated'));
+    localStorage.setItem("activitiesList", JSON.stringify(updated));
+    window.dispatchEvent(new Event("activitiesListUpdated"));
   };
 
   const toggleResolved = (id) => {
-    const updated = activitiesList.map(a => {
+    const updated = activitiesList.map((a) => {
       if (a.id !== id) return a;
-      const isResolved = a.status === 'Resolved';
-      const nextStatus = isResolved ? (a.previousStatus || 'To Do') : 'Resolved';
-      const logAction = isResolved ? 'Reopened' : 'Resolved';
-      const previousStatus = isResolved ? undefined : (a.status || 'To Do');
+      const isResolved = a.status === "Resolved";
+      const nextStatus = isResolved ? a.previousStatus || "To Do" : "Resolved";
+      const logAction = isResolved ? "Reopened" : "Resolved";
+      const previousStatus = isResolved ? undefined : a.status || "To Do";
       return {
         ...a,
         status: nextStatus,
         previousStatus,
-        activityLog: [...(a.activityLog || []), { user: Array.isArray(a.responsible) ? a.responsible.join(', ') : '', action: logAction, timestamp: new Date().toLocaleString() }]
+        activityLog: [
+          ...(a.activityLog || []),
+          {
+            user: Array.isArray(a.responsible) ? a.responsible.join(", ") : "",
+            action: logAction,
+            timestamp: new Date().toLocaleString(),
+          },
+        ],
       };
     });
     setActivitiesList(updated);
-    localStorage.setItem('activitiesList', JSON.stringify(updated));
-    window.dispatchEvent(new Event('activitiesListUpdated'));
+    localStorage.setItem("activitiesList", JSON.stringify(updated));
+    window.dispatchEvent(new Event("activitiesListUpdated"));
   };
 
   return (
@@ -693,10 +917,12 @@ export default function Activities() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          {user?.department === 'Support' ? (
+          {user?.department === "Support" ? (
             <>
               <h1 className="text-3xl font-bold text-foreground">Tickets</h1>
-              <p className="text-muted-foreground mt-1">Comprehensive Ticket Management System</p>
+              <p className="text-muted-foreground mt-1">
+                Comprehensive Ticket Management System
+              </p>
             </>
           ) : (
             <>
@@ -707,69 +933,122 @@ export default function Activities() {
             </>
           )}
         </div>
-        <Dialog open={isDialogOpen} onOpenChange={(open) => open && setIsDialogOpen(open)}>
+        <Dialog
+          open={isDialogOpen}
+          onOpenChange={(open) => open && setIsDialogOpen(open)}
+        >
           <div className="flex items-center gap-2">
-            {user?.department !== 'Support' && (
+            {user?.department !== "Support" && (
               <a href="/projects">
-                <Button variant="outline" className="border-blue-200 text-blue-700 hover:bg-blue-50">Create Project</Button>
+                <Button
+                  variant="outline"
+                  className="border-blue-200 text-blue-700 hover:bg-blue-50"
+                >
+                  Create Project
+                </Button>
               </a>
             )}
             <DialogTrigger asChild>
               <Button className="bg-blue-600 hover:bg-blue-700 text-white">
                 <Plus className="h-4 w-4 mr-2" />
-                {user?.department === 'Support' ? 'New Ticket' : 'New Activity'}
+                {user?.department === "Support" ? "New Ticket" : "New Activity"}
               </Button>
             </DialogTrigger>
           </div>
-          <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto" onPointerDownOutside={(e) => e.preventDefault()}>
+          <DialogContent
+            className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto"
+            onPointerDownOutside={(e) => e.preventDefault()}
+          >
             <DialogHeader>
-              <DialogTitle>{user?.department === 'Support' ? 'Register Support Ticket' : 'Create New Activity'}</DialogTitle>
+              <DialogTitle>
+                {user?.department === "Support"
+                  ? "Register Support Ticket"
+                  : "Create New Activity"}
+              </DialogTitle>
               <DialogDescription>
-                {user?.department === 'Support' ? 'Create a new support ticket. It will also appear in Activities.' : 'Add a comprehensive activity with full tracking capabilities'}
+                {user?.department === "Support"
+                  ? "Create a new support ticket. It will also appear in Activities."
+                  : "Add a comprehensive activity with full tracking capabilities"}
               </DialogDescription>
             </DialogHeader>
-            {user?.department === 'Support' && (
+            {user?.department === "Support" && (
               <div className="grid gap-6 py-4">
                 <div className="space-y-2">
                   <Label htmlFor="ticket-title">Title *</Label>
-                  <Input id="ticket-title" value={newTicket.title} onChange={(e) => setNewTicket(v => ({...v, title: e.target.value}))} placeholder="Short issue summary" />
+                  <Input
+                    id="ticket-title"
+                    value={newTicket.title}
+                    onChange={(e) =>
+                      setNewTicket((v) => ({ ...v, title: e.target.value }))
+                    }
+                    placeholder="Short issue summary"
+                  />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="ticket-client">Client *</Label>
-                    <Select value={newTicket.client} onValueChange={(val) => {
-                      let isPremium = false;
-                      try {
-                        const saved = localStorage.getItem('organizationData');
-                        const list = saved ? JSON.parse(saved) : [];
-                        const org = Array.isArray(list) ? list.find(o => o.organizationName === val) : null;
-                        isPremium = !!(org && org.premiumSupport);
-                      } catch {}
-                      setNewTicket(v => ({...v, client: val, premium: isPremium}));
-                    }}>
+                    <Select
+                      value={newTicket.client}
+                      onValueChange={(val) => {
+                        let isPremium = false;
+                        try {
+                          const saved =
+                            localStorage.getItem("organizationData");
+                          const list = saved ? JSON.parse(saved) : [];
+                          const org = Array.isArray(list)
+                            ? list.find((o) => o.organizationName === val)
+                            : null;
+                          isPremium = !!(org && org.premiumSupport);
+                        } catch {}
+                        setNewTicket((v) => ({
+                          ...v,
+                          client: val,
+                          premium: isPremium,
+                        }));
+                      }}
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="client name" />
                       </SelectTrigger>
                       <SelectContent>
-                        {clients.filter(c => c !== "All Clients").sort().map(c => (
-                          <SelectItem key={c} value={c}>{c}</SelectItem>
-                        ))}
+                        {clients
+                          .filter((c) => c !== "All Clients")
+                          .sort()
+                          .map((c) => (
+                            <SelectItem key={c} value={c}>
+                              {c}
+                            </SelectItem>
+                          ))}
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-2">
                     <Label>Assignees *</Label>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      {TEAM_MEMBERS.map(m => (
-                        <label key={m.name} className="flex items-center space-x-2 p-2 rounded bg-background/50">
+                      {TEAM_MEMBERS.map((m) => (
+                        <label
+                          key={m.name}
+                          className="flex items-center space-x-2 p-2 rounded bg-background/50"
+                        >
                           <input
                             type="checkbox"
                             className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500 rounded"
-                            checked={Array.isArray(newTicket.assignees) ? newTicket.assignees.includes(m.name) : false}
+                            checked={
+                              Array.isArray(newTicket.assignees)
+                                ? newTicket.assignees.includes(m.name)
+                                : false
+                            }
                             onChange={(e) => {
-                              const current = Array.isArray(newTicket.assignees) ? newTicket.assignees : [];
-                              const updated = e.target.checked ? [...current, m.name] : current.filter(n => n !== m.name);
-                              setNewTicket(v => ({...v, assignees: updated}));
+                              const current = Array.isArray(newTicket.assignees)
+                                ? newTicket.assignees
+                                : [];
+                              const updated = e.target.checked
+                                ? [...current, m.name]
+                                : current.filter((n) => n !== m.name);
+                              setNewTicket((v) => ({
+                                ...v,
+                                assignees: updated,
+                              }));
                             }}
                           />
                           <span className="text-sm">{m.name}</span>
@@ -781,21 +1060,69 @@ export default function Activities() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="ticket-priority">Priority</Label>
-                    <Select value={newTicket.priority} onValueChange={(val) => setNewTicket(v => ({...v, priority: val}))}>
-                      <SelectTrigger className={newTicket.priority ? getSupportPriorityColor(newTicket.priority) + " bg-opacity-20" : ""}>
+                    <Select
+                      value={newTicket.priority}
+                      onValueChange={(val) =>
+                        setNewTicket((v) => ({ ...v, priority: val }))
+                      }
+                    >
+                      <SelectTrigger
+                        className={
+                          newTicket.priority
+                            ? getSupportPriorityColor(newTicket.priority) +
+                              " bg-opacity-20"
+                            : ""
+                        }
+                      >
                         <SelectValue placeholder="Select priority" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="urgent" className={getSupportPriorityColor('urgent') + ' hover:opacity-90'}>Urgent</SelectItem>
-                        <SelectItem value="high" className={getSupportPriorityColor('high') + ' hover:opacity-90'}>High</SelectItem>
-                        <SelectItem value="medium" className={getSupportPriorityColor('medium') + ' hover:opacity-90'}>Medium</SelectItem>
-                        <SelectItem value="low" className={getSupportPriorityColor('low') + ' hover:opacity-90'}>Low</SelectItem>
+                        <SelectItem
+                          value="urgent"
+                          className={
+                            getSupportPriorityColor("urgent") +
+                            " hover:opacity-90"
+                          }
+                        >
+                          Urgent
+                        </SelectItem>
+                        <SelectItem
+                          value="high"
+                          className={
+                            getSupportPriorityColor("high") +
+                            " hover:opacity-90"
+                          }
+                        >
+                          High
+                        </SelectItem>
+                        <SelectItem
+                          value="medium"
+                          className={
+                            getSupportPriorityColor("medium") +
+                            " hover:opacity-90"
+                          }
+                        >
+                          Medium
+                        </SelectItem>
+                        <SelectItem
+                          value="low"
+                          className={
+                            getSupportPriorityColor("low") + " hover:opacity-90"
+                          }
+                        >
+                          Low
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="ticket-category">Category</Label>
-                    <Select value={newTicket.category} onValueChange={(val) => setNewTicket(v => ({...v, category: val}))}>
+                    <Select
+                      value={newTicket.category}
+                      onValueChange={(val) =>
+                        setNewTicket((v) => ({ ...v, category: val }))
+                      }
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="Select category" />
                       </SelectTrigger>
@@ -810,60 +1137,108 @@ export default function Activities() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="ticket-description">Description</Label>
-                  <Textarea id="ticket-description" rows={4} value={newTicket.description} onChange={(e) => setNewTicket(v => ({...v, description: e.target.value}))} placeholder="Describe the issue..." />
+                  <Textarea
+                    id="ticket-description"
+                    rows={4}
+                    value={newTicket.description}
+                    onChange={(e) =>
+                      setNewTicket((v) => ({
+                        ...v,
+                        description: e.target.value,
+                      }))
+                    }
+                    placeholder="Describe the issue..."
+                  />
                 </div>
                 <div className="flex items-center space-x-2 pt-2">
-                  <input id="ticket-premium" type="checkbox" className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500 rounded" checked={newTicket.premium} onChange={(e) => setNewTicket(v => ({...v, premium: e.target.checked}))} />
+                  <input
+                    id="ticket-premium"
+                    type="checkbox"
+                    className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500 rounded"
+                    checked={newTicket.premium}
+                    onChange={(e) =>
+                      setNewTicket((v) => ({ ...v, premium: e.target.checked }))
+                    }
+                  />
                   <Label htmlFor="ticket-premium">Premium</Label>
                 </div>
               </div>
             )}
 
-            <div className={`grid gap-6 py-4 ${user?.department === 'Support' ? 'hidden' : ''}`}>
+            <div
+              className={`grid gap-6 py-4 ${user?.department === "Support" ? "hidden" : ""}`}
+            >
               {/* Activity Type */}
               <div className="space-y-2">
                 <Label htmlFor="activityType">Activity Type *</Label>
-                <Select value={newActivity.activityType} onValueChange={(value) => handleInputChange('activityType', value)}>
+                <Select
+                  value={newActivity.activityType}
+                  onValueChange={(value) =>
+                    handleInputChange("activityType", value)
+                  }
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Select activity type" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="Call">Call</SelectItem>
                     <SelectItem value="Email">Email</SelectItem>
-                    <SelectItem value="Online Meeting">Online Meeting</SelectItem>
-                    <SelectItem value="In-person Meeting">In-person Meeting</SelectItem>
+                    <SelectItem value="Online Meeting">
+                      Online Meeting
+                    </SelectItem>
+                    <SelectItem value="In-person Meeting">
+                      In-person Meeting
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-
 
               {/* Client & Unit Type */}
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="linkedClient">Linked Client *</Label>
-                  <Select value={newActivity.linkedClient} onValueChange={(value) => {
-                    let premium = false;
-                    try {
-                      const savedLeads = localStorage.getItem('sales_leads');
-                      const leads = savedLeads ? JSON.parse(savedLeads) : [];
-                      const match = Array.isArray(leads) ? leads.find(l => l?.name === value) : null;
-                      if (match && typeof match.isPremium === 'boolean') premium = !!match.isPremium;
-                      if (!premium) {
-                        const savedOrgs = localStorage.getItem('organizationData');
-                        const orgs = savedOrgs ? JSON.parse(savedOrgs) : [];
-                        const org = Array.isArray(orgs) ? orgs.find(o => o?.organizationName === value) : null;
-                        if (org && typeof org.premiumSupport === 'boolean') premium = !!org.premiumSupport;
-                      }
-                    } catch {}
-                    setNewActivity(p => ({ ...p, linkedClient: value, premiumSupport: premium }));
-                  }}>
+                  <Select
+                    value={newActivity.linkedClient}
+                    onValueChange={(value) => {
+                      let premium = false;
+                      try {
+                        const savedLeads = localStorage.getItem("sales_leads");
+                        const leads = savedLeads ? JSON.parse(savedLeads) : [];
+                        const match = Array.isArray(leads)
+                          ? leads.find((l) => l?.name === value)
+                          : null;
+                        if (match && typeof match.isPremium === "boolean")
+                          premium = !!match.isPremium;
+                        if (!premium) {
+                          const savedOrgs =
+                            localStorage.getItem("organizationData");
+                          const orgs = savedOrgs ? JSON.parse(savedOrgs) : [];
+                          const org = Array.isArray(orgs)
+                            ? orgs.find((o) => o?.organizationName === value)
+                            : null;
+                          if (org && typeof org.premiumSupport === "boolean")
+                            premium = !!org.premiumSupport;
+                        }
+                      } catch {}
+                      setNewActivity((p) => ({
+                        ...p,
+                        linkedClient: value,
+                        premiumSupport: premium,
+                      }));
+                    }}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Select organization" />
                     </SelectTrigger>
                     <SelectContent>
-                      {clients.filter(c => c !== "All Clients").sort().map((c) => (
-                        <SelectItem key={c} value={c}>{c}</SelectItem>
-                      ))}
+                      {clients
+                        .filter((c) => c !== "All Clients")
+                        .sort()
+                        .map((c) => (
+                          <SelectItem key={c} value={c}>
+                            {c}
+                          </SelectItem>
+                        ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -879,10 +1254,17 @@ export default function Activities() {
                         name="unitType"
                         value="Government"
                         checked={newActivity.unitType === "Government"}
-                        onChange={(e) => handleInputChange('unitType', e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange("unitType", e.target.value)
+                        }
                         className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
                       />
-                      <Label htmlFor="unit-government" className="text-sm font-medium">Government</Label>
+                      <Label
+                        htmlFor="unit-government"
+                        className="text-sm font-medium"
+                      >
+                        Government
+                      </Label>
                     </div>
                     <div className="flex items-center space-x-2">
                       <input
@@ -891,10 +1273,17 @@ export default function Activities() {
                         name="unitType"
                         value="Independent"
                         checked={newActivity.unitType === "Independent"}
-                        onChange={(e) => handleInputChange('unitType', e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange("unitType", e.target.value)
+                        }
                         className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
                       />
-                      <Label htmlFor="unit-independent" className="text-sm font-medium">Independent</Label>
+                      <Label
+                        htmlFor="unit-independent"
+                        className="text-sm font-medium"
+                      >
+                        Independent
+                      </Label>
                     </div>
                   </div>
                 </div>
@@ -908,7 +1297,7 @@ export default function Activities() {
                     id="date"
                     type="date"
                     value={newActivity.date}
-                    onChange={(e) => handleInputChange('date', e.target.value)}
+                    onChange={(e) => handleInputChange("date", e.target.value)}
                   />
                 </div>
                 <div className="space-y-2">
@@ -917,7 +1306,7 @@ export default function Activities() {
                     id="time"
                     type="time"
                     value={newActivity.time}
-                    onChange={(e) => handleInputChange('time', e.target.value)}
+                    onChange={(e) => handleInputChange("time", e.target.value)}
                   />
                 </div>
               </div>
@@ -930,17 +1319,22 @@ export default function Activities() {
                     <div key={member} className="flex items-center space-x-2">
                       <input
                         type="checkbox"
-                        id={`responsible-${member.replace(' ', '-').toLowerCase()}`}
+                        id={`responsible-${member.replace(" ", "-").toLowerCase()}`}
                         checked={newActivity.responsible.includes(member)}
                         onChange={(e) => {
                           const updatedResponsible = e.target.checked
                             ? [...newActivity.responsible, member]
-                            : newActivity.responsible.filter(m => m !== member);
-                          handleInputChange('responsible', updatedResponsible);
+                            : newActivity.responsible.filter(
+                                (m) => m !== member,
+                              );
+                          handleInputChange("responsible", updatedResponsible);
                         }}
                         className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500 rounded"
                       />
-                      <Label htmlFor={`responsible-${member.replace(' ', '-').toLowerCase()}`} className="text-sm font-medium">
+                      <Label
+                        htmlFor={`responsible-${member.replace(" ", "-").toLowerCase()}`}
+                        className="text-sm font-medium"
+                      >
                         {member}
                       </Label>
                     </div>
@@ -952,29 +1346,93 @@ export default function Activities() {
               <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="status">Status</Label>
-                  <Select value={newActivity.status} onValueChange={(value) => handleInputChange('status', value)}>
+                  <Select
+                    value={newActivity.status}
+                    onValueChange={(value) =>
+                      handleInputChange("status", value)
+                    }
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Select status" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="To Do" className={getStatusColor("To Do") + " hover:opacity-90"}>To Do</SelectItem>
-                      <SelectItem value="In Progress" className={getStatusColor("In Progress") + " hover:opacity-90"}>In Progress</SelectItem>
-                      <SelectItem value="Done" className={getStatusColor("Done") + " hover:opacity-90"}>Done</SelectItem>
-                      <SelectItem value="Resolved" className={getStatusColor("Resolved") + " hover:opacity-90"}>Resolved</SelectItem>
+                      <SelectItem
+                        value="To Do"
+                        className={
+                          getStatusColor("To Do") + " hover:opacity-90"
+                        }
+                      >
+                        To Do
+                      </SelectItem>
+                      <SelectItem
+                        value="In Progress"
+                        className={
+                          getStatusColor("In Progress") + " hover:opacity-90"
+                        }
+                      >
+                        In Progress
+                      </SelectItem>
+                      <SelectItem
+                        value="Done"
+                        className={getStatusColor("Done") + " hover:opacity-90"}
+                      >
+                        Done
+                      </SelectItem>
+                      <SelectItem
+                        value="Resolved"
+                        className={
+                          getStatusColor("Resolved") + " hover:opacity-90"
+                        }
+                      >
+                        Resolved
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="priority">Priority</Label>
-                  <Select value={newActivity.priority} onValueChange={(value) => handleInputChange('priority', value)}>
+                  <Select
+                    value={newActivity.priority}
+                    onValueChange={(value) =>
+                      handleInputChange("priority", value)
+                    }
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Select priority" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Low" className={getPriorityColor("Low") + " hover:opacity-90"}>Low</SelectItem>
-                      <SelectItem value="Medium" className={getPriorityColor("Medium") + " hover:opacity-90"}>Medium</SelectItem>
-                      <SelectItem value="High" className={getPriorityColor("High") + " hover:opacity-90"}>High</SelectItem>
-                      <SelectItem value="Urgent" className={getPriorityColor("Urgent") + " hover:opacity-90"}>Urgent</SelectItem>
+                      <SelectItem
+                        value="Low"
+                        className={
+                          getPriorityColor("Low") + " hover:opacity-90"
+                        }
+                      >
+                        Low
+                      </SelectItem>
+                      <SelectItem
+                        value="Medium"
+                        className={
+                          getPriorityColor("Medium") + " hover:opacity-90"
+                        }
+                      >
+                        Medium
+                      </SelectItem>
+                      <SelectItem
+                        value="High"
+                        className={
+                          getPriorityColor("High") + " hover:opacity-90"
+                        }
+                      >
+                        High
+                      </SelectItem>
+                      <SelectItem
+                        value="Urgent"
+                        className={
+                          getPriorityColor("Urgent") + " hover:opacity-90"
+                        }
+                      >
+                        Urgent
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -984,7 +1442,9 @@ export default function Activities() {
                     id="deadline"
                     type="date"
                     value={newActivity.deadline}
-                    onChange={(e) => handleInputChange('deadline', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("deadline", e.target.value)
+                    }
                   />
                 </div>
               </div>
@@ -997,7 +1457,9 @@ export default function Activities() {
                     id="reminderDate"
                     type="date"
                     value={newActivity.reminderDate}
-                    onChange={(e) => handleInputChange('reminderDate', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("reminderDate", e.target.value)
+                    }
                   />
                 </div>
                 <div className="space-y-2">
@@ -1006,7 +1468,9 @@ export default function Activities() {
                     id="nextStepDate"
                     type="date"
                     value={newActivity.nextStepDate}
-                    onChange={(e) => handleInputChange('nextStepDate', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("nextStepDate", e.target.value)
+                    }
                   />
                 </div>
               </div>
@@ -1018,7 +1482,9 @@ export default function Activities() {
                   id="nextStep"
                   placeholder="Describe the next action to be taken"
                   value={newActivity.nextStep}
-                  onChange={(e) => handleInputChange('nextStep', e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("nextStep", e.target.value)
+                  }
                 />
               </div>
 
@@ -1031,7 +1497,9 @@ export default function Activities() {
                     type="number"
                     placeholder="0"
                     value={newActivity.costPerActivity}
-                    onChange={(e) => handleInputChange('costPerActivity', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("costPerActivity", e.target.value)
+                    }
                   />
                 </div>
                 <div className="space-y-2 flex items-center gap-4 pt-6">
@@ -1040,7 +1508,9 @@ export default function Activities() {
                       type="checkbox"
                       id="premiumSupport"
                       checked={newActivity.premiumSupport}
-                      onChange={(e) => handleInputChange('premiumSupport', e.target.checked)}
+                      onChange={(e) =>
+                        handleInputChange("premiumSupport", e.target.checked)
+                      }
                     />
                     <Label htmlFor="premiumSupport">Premium</Label>
                   </div>
@@ -1054,7 +1524,7 @@ export default function Activities() {
                   id="notes"
                   placeholder="Enter activity notes and details..."
                   value={newActivity.notes}
-                  onChange={(e) => handleInputChange('notes', e.target.value)}
+                  onChange={(e) => handleInputChange("notes", e.target.value)}
                   rows={3}
                 />
               </div>
@@ -1063,55 +1533,92 @@ export default function Activities() {
               <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
                 Cancel
               </Button>
-              <Button onClick={handleAddActivity} className={`bg-blue-600 hover:bg-blue-700 ${user?.department === 'Support' ? 'hidden' : ''}`}>
+              <Button
+                onClick={handleAddActivity}
+                className={`bg-blue-600 hover:bg-blue-700 ${user?.department === "Support" ? "hidden" : ""}`}
+              >
                 Create Activity
               </Button>
-              <Button className={`bg-blue-600 hover:bg-blue-700 ${user?.department === 'Support' ? '' : 'hidden'}`} onClick={() => {
-                if (!newTicket.title || !newTicket.client || !Array.isArray(newTicket.assignees) || newTicket.assignees.length === 0) {
-                  alert("Please fill in title, client and at least one assignee");
-                  return;
-                }
-                try {
-                  const saved = localStorage.getItem('activitiesList');
-                  const list = saved ? JSON.parse(saved) : [];
-                  const now = new Date();
-                  const mapPriority = (p) => p === 'urgent' ? 'Urgent' : p === 'high' ? 'High' : p === 'low' ? 'Low' : 'Medium';
-                  const activity = {
-                    id: (list?.[0]?.id || 0) + list.length + 1,
-                    activityType: 'Email',
-                    category: 'Support',
-                    linkedClient: newTicket.client,
-                    unitType: 'Government',
-                    date: now.toISOString().split('T')[0],
-                    time: now.toTimeString().slice(0,5),
-                    responsible: newTicket.assignees,
-                    status: 'To Do',
-                    deadline: '',
-                    reminderDate: '',
-                    nextStep: '',
-                    nextStepDate: '',
-                    notes: newTicket.description || newTicket.title,
-                    attachments: [],
-                    costPerActivity: 0,
-                    premiumSupport: !!newTicket.premium,
-                    ticketType: newTicket.category,
-                    isTicket: true,
-                    priority: mapPriority(newTicket.priority),
-                    activityLog: [
-                      { user: Array.isArray(newTicket.assignees) ? newTicket.assignees.join(', ') : '', action: 'Created', timestamp: new Date().toLocaleString() }
-                    ],
-                  };
-                  const updated = [activity, ...list];
-                  localStorage.setItem('activitiesList', JSON.stringify(updated));
-                  window.dispatchEvent(new Event('activitiesListUpdated'));
-                  setIsDialogOpen(false);
-                  setNewTicket({ title: '', client: '', priority: 'medium', category: 'Bug', assignees: [], description: '', premium: false });
-                  alert('Ticket registered successfully');
-                } catch (e) {
-                  console.error('Failed to register ticket', e);
-                  alert('Failed to register ticket');
-                }
-              }}>
+              <Button
+                className={`bg-blue-600 hover:bg-blue-700 ${user?.department === "Support" ? "" : "hidden"}`}
+                onClick={() => {
+                  if (
+                    !newTicket.title ||
+                    !newTicket.client ||
+                    !Array.isArray(newTicket.assignees) ||
+                    newTicket.assignees.length === 0
+                  ) {
+                    alert(
+                      "Please fill in title, client and at least one assignee",
+                    );
+                    return;
+                  }
+                  try {
+                    const saved = localStorage.getItem("activitiesList");
+                    const list = saved ? JSON.parse(saved) : [];
+                    const now = new Date();
+                    const mapPriority = (p) =>
+                      p === "urgent"
+                        ? "Urgent"
+                        : p === "high"
+                          ? "High"
+                          : p === "low"
+                            ? "Low"
+                            : "Medium";
+                    const activity = {
+                      id: (list?.[0]?.id || 0) + list.length + 1,
+                      activityType: "Email",
+                      category: "Support",
+                      linkedClient: newTicket.client,
+                      unitType: "Government",
+                      date: now.toISOString().split("T")[0],
+                      time: now.toTimeString().slice(0, 5),
+                      responsible: newTicket.assignees,
+                      status: "To Do",
+                      deadline: "",
+                      reminderDate: "",
+                      nextStep: "",
+                      nextStepDate: "",
+                      notes: newTicket.description || newTicket.title,
+                      attachments: [],
+                      costPerActivity: 0,
+                      premiumSupport: !!newTicket.premium,
+                      ticketType: newTicket.category,
+                      isTicket: true,
+                      priority: mapPriority(newTicket.priority),
+                      activityLog: [
+                        {
+                          user: Array.isArray(newTicket.assignees)
+                            ? newTicket.assignees.join(", ")
+                            : "",
+                          action: "Created",
+                          timestamp: new Date().toLocaleString(),
+                        },
+                      ],
+                    };
+                    const updated = [activity, ...list];
+                    localStorage.setItem(
+                      "activitiesList",
+                      JSON.stringify(updated),
+                    );
+                    window.dispatchEvent(new Event("activitiesListUpdated"));
+                    setIsDialogOpen(false);
+                    setNewTicket({
+                      title: "",
+                      client: "",
+                      priority: "medium",
+                      category: "Bug",
+                      assignees: [],
+                      description: "",
+                      premium: false,
+                    });
+                    alert("Ticket registered successfully");
+                  } catch (e) {
+                    console.error("Failed to register ticket", e);
+                    alert("Failed to register ticket");
+                  }
+                }}
+              >
                 Register Ticket
               </Button>
             </DialogFooter>
@@ -1163,13 +1670,16 @@ export default function Activities() {
             </div>
           </div>
         </CardHeader>
-        <CardContent id="activities-filters-content" className={isFiltersOpen ? "" : "hidden"}>
+        <CardContent
+          id="activities-filters-content"
+          className={isFiltersOpen ? "" : "hidden"}
+        >
           <div className="space-y-4">
             {/* Search */}
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input 
-                placeholder="Search activities, clients, or notes..." 
+              <Input
+                placeholder="Search activities, clients, or notes..."
                 className="pl-10 bg-background/80"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -1177,33 +1687,53 @@ export default function Activities() {
             </div>
 
             {/* Filter Row 1 */}
-            <div className={`grid gap-4 ${user?.department === 'Support' ? 'grid-cols-1 md:grid-cols-3' : 'grid-cols-1 md:grid-cols-2'}`}>
+            <div
+              className={`grid gap-4 ${user?.department === "Support" ? "grid-cols-1 md:grid-cols-3" : "grid-cols-1 md:grid-cols-2"}`}
+            >
               <Select value={selectedType} onValueChange={setSelectedType}>
                 <SelectTrigger className="bg-background/80">
-                  <SelectValue placeholder={user?.department === 'Support' ? "Category" : "Activity Type"} />
+                  <SelectValue
+                    placeholder={
+                      user?.department === "Support"
+                        ? "Category"
+                        : "Activity Type"
+                    }
+                  />
                 </SelectTrigger>
                 <SelectContent>
-                  {(user?.department === 'Support' ? supportTicketCategories : activityTypes).map((type) => (
-                    <SelectItem key={type} value={type}>{type}</SelectItem>
+                  {(user?.department === "Support"
+                    ? supportTicketCategories
+                    : activityTypes
+                  ).map((type) => (
+                    <SelectItem key={type} value={type}>
+                      {type}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
 
-              {user?.department === 'Support' && (
-                <Select value={selectedPremiumClient} onValueChange={setSelectedPremiumClient}>
+              {user?.department === "Support" && (
+                <Select
+                  value={selectedPremiumClient}
+                  onValueChange={setSelectedPremiumClient}
+                >
                   <SelectTrigger className="bg-background/80">
                     <SelectValue placeholder="Premium Clients" />
                   </SelectTrigger>
                   <SelectContent>
                     {["All", "Premium", "Not Premium"].map((opt) => (
-                      <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                      <SelectItem key={opt} value={opt}>
+                        {opt}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               )}
 
               <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-                <SelectTrigger className={`bg-background/80 ${selectedStatus !== "All Statuses" ? getStatusColor(selectedStatus) : ""}`}>
+                <SelectTrigger
+                  className={`bg-background/80 ${selectedStatus !== "All Statuses" ? getStatusColor(selectedStatus) : ""}`}
+                >
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -1211,14 +1741,17 @@ export default function Activities() {
                     <SelectItem
                       key={status}
                       value={status}
-                      className={status !== "All Statuses" ? getStatusColor(status) + " hover:opacity-90" : "hover:bg-gray-50"}
+                      className={
+                        status !== "All Statuses"
+                          ? getStatusColor(status) + " hover:opacity-90"
+                          : "hover:bg-gray-50"
+                      }
                     >
                       {status}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-
             </div>
 
             {/* Filter Row 2 */}
@@ -1229,7 +1762,9 @@ export default function Activities() {
                 </SelectTrigger>
                 <SelectContent>
                   {clients.map((client) => (
-                    <SelectItem key={client} value={client}>{client}</SelectItem>
+                    <SelectItem key={client} value={client}>
+                      {client}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -1240,13 +1775,20 @@ export default function Activities() {
                 </SelectTrigger>
                 <SelectContent>
                   {teamMembers.map((member) => (
-                    <SelectItem key={member} value={member}>{member}</SelectItem>
+                    <SelectItem key={member} value={member}>
+                      {member}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
 
-              <Select value={selectedPriority} onValueChange={setSelectedPriority}>
-                <SelectTrigger className={`bg-background/80 ${selectedPriority !== "All Priorities" ? getPriorityColor(selectedPriority) : ""}`}>
+              <Select
+                value={selectedPriority}
+                onValueChange={setSelectedPriority}
+              >
+                <SelectTrigger
+                  className={`bg-background/80 ${selectedPriority !== "All Priorities" ? getPriorityColor(selectedPriority) : ""}`}
+                >
                   <SelectValue placeholder="Priority" />
                 </SelectTrigger>
                 <SelectContent>
@@ -1254,20 +1796,28 @@ export default function Activities() {
                     <SelectItem
                       key={priority}
                       value={priority}
-                      className={priority !== "All Priorities" ? getPriorityColor(priority) + " hover:opacity-90" : "hover:bg-gray-50"}
+                      className={
+                        priority !== "All Priorities"
+                          ? getPriorityColor(priority) + " hover:opacity-90"
+                          : "hover:bg-gray-50"
+                      }
                     >
                       {priority}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-
             </div>
 
             {/* Date Range Filter Row */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="fromDate" className="text-sm font-medium text-gray-700">From Date</Label>
+                <Label
+                  htmlFor="fromDate"
+                  className="text-sm font-medium text-gray-700"
+                >
+                  From Date
+                </Label>
                 <Input
                   id="fromDate"
                   type="date"
@@ -1277,7 +1827,12 @@ export default function Activities() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="toDate" className="text-sm font-medium text-gray-700">To Date</Label>
+                <Label
+                  htmlFor="toDate"
+                  className="text-sm font-medium text-gray-700"
+                >
+                  To Date
+                </Label>
                 <Input
                   id="toDate"
                   type="date"
@@ -1294,46 +1849,73 @@ export default function Activities() {
       {/* Activities List */}
       <div className="space-y-4">
         {filteredActivities.map((activity) => (
-          <Card key={activity.id} className="border-blue-200/50 bg-white/90 backdrop-blur-sm hover:shadow-lg transition-all duration-200">
+          <Card
+            key={activity.id}
+            className="border-blue-200/50 bg-white/90 backdrop-blur-sm hover:shadow-lg transition-all duration-200"
+          >
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4 flex-1">
-                  <div className={`flex items-center justify-center w-12 h-12 rounded-lg mt-1 ${getCategoryIconBackground(activity.category)}`}>
+                  <div
+                    className={`flex items-center justify-center w-12 h-12 rounded-lg mt-1 ${getCategoryIconBackground(activity.category)}`}
+                  >
                     {getActivityTypeIcon(activity.activityType)}
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-3 mt-1">
-                      <h3 className="font-semibold text-foreground">{activity.linkedClient}</h3>
-                      <Badge variant="outline" className={getCategoryColor(activity.category)}>
+                      <h3 className="font-semibold text-foreground">
+                        {activity.linkedClient}
+                      </h3>
+                      <Badge
+                        variant="outline"
+                        className={getCategoryColor(activity.category)}
+                      >
                         {activity.category}
                       </Badge>
-                      <Badge variant="outline" className={getStatusColor(activity.status)}>
+                      <Badge
+                        variant="outline"
+                        className={getStatusColor(activity.status)}
+                      >
                         {activity.status}
                       </Badge>
                       {activity.isTicket && (
-                        <Badge variant="outline" className={getTicketTypeColor(activity.ticketType)}>
+                        <Badge
+                          variant="outline"
+                          className={getTicketTypeColor(activity.ticketType)}
+                        >
                           {getTicketTypeIcon(activity.ticketType)}
                           <span className="ml-1">{activity.ticketType}</span>
                         </Badge>
                       )}
                       {activity.premiumSupport && (
-                        <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-200">
+                        <Badge
+                          variant="outline"
+                          className="bg-yellow-100 text-yellow-800 border-yellow-200"
+                        >
                           <Star className="h-3 w-3 mr-1" />
                           Premium
                         </Badge>
                       )}
                     </div>
-                    
-                    <p className="text-sm text-muted-foreground mb-3">{activity.notes}</p>
+
+                    <p className="text-sm text-muted-foreground mb-3">
+                      {activity.notes}
+                    </p>
 
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs text-muted-foreground mb-3">
                       <div className="flex items-center space-x-1">
                         <Calendar className="h-3 w-3" />
-                        <span>{activity.date} at {activity.time}</span>
+                        <span>
+                          {activity.date} at {activity.time}
+                        </span>
                       </div>
                       <div className="flex items-center space-x-1">
                         <User className="h-3 w-3" />
-                        <span>{Array.isArray(activity.responsible) ? activity.responsible.join(", ") : activity.responsible}</span>
+                        <span>
+                          {Array.isArray(activity.responsible)
+                            ? activity.responsible.join(", ")
+                            : activity.responsible}
+                        </span>
                       </div>
                       <div
                         className="flex items-center space-x-1 text-blue-600 hover:text-blue-800 cursor-pointer transition-colors"
@@ -1360,7 +1942,11 @@ export default function Activities() {
                     {activity.nextStep && (
                       <div className="mt-2 p-2 bg-blue-50 rounded text-xs">
                         <strong>Next Step:</strong> {activity.nextStep}
-                        {activity.nextStepDate && <span className="ml-2 text-muted-foreground">({activity.nextStepDate})</span>}
+                        {activity.nextStepDate && (
+                          <span className="ml-2 text-muted-foreground">
+                            ({activity.nextStepDate})
+                          </span>
+                        )}
                       </div>
                     )}
 
@@ -1374,9 +1960,12 @@ export default function Activities() {
                     )}
                   </div>
                 </div>
-                
+
                 <div className="flex flex-col items-end space-y-2 mt-1">
-                  <Badge variant="outline" className={getPriorityColor(activity.priority)}>
+                  <Badge
+                    variant="outline"
+                    className={getPriorityColor(activity.priority)}
+                  >
                     {activity.priority}
                   </Badge>
                   <div className="flex space-x-2">
@@ -1402,11 +1991,19 @@ export default function Activities() {
                       variant="outline"
                       size="sm"
                       onClick={() => toggleResolved(activity.id)}
-                      className={activity.status === 'Resolved' ? 'border-gray-200 text-gray-600 hover:bg-gray-50' : 'border-emerald-200 text-emerald-600 hover:bg-emerald-50'}
-                      title={activity.status === 'Resolved' ? 'Reopen ticket' : 'Mark as Resolved'}
+                      className={
+                        activity.status === "Resolved"
+                          ? "border-gray-200 text-gray-600 hover:bg-gray-50"
+                          : "border-emerald-200 text-emerald-600 hover:bg-emerald-50"
+                      }
+                      title={
+                        activity.status === "Resolved"
+                          ? "Reopen ticket"
+                          : "Mark as Resolved"
+                      }
                     >
                       <CheckCircle className="h-3 w-3 mr-1" />
-                      {activity.status === 'Resolved' ? 'Reopen' : 'Resolve'}
+                      {activity.status === "Resolved" ? "Reopen" : "Resolve"}
                     </Button>
                     <Button
                       variant="outline"
@@ -1430,14 +2027,15 @@ export default function Activities() {
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center space-x-2">
-              {selectedActivity && getActivityTypeIcon(selectedActivity.activityType)}
+              {selectedActivity &&
+                getActivityTypeIcon(selectedActivity.activityType)}
               <span>{selectedActivity?.linkedClient} - Activity Details</span>
             </DialogTitle>
             <DialogDescription>
               Comprehensive activity and ticket information
             </DialogDescription>
           </DialogHeader>
-          
+
           {selectedActivity && (
             <div className="space-y-6">
               {/* Status Overview */}
@@ -1449,19 +2047,25 @@ export default function Activities() {
                   <p className="text-xs text-gray-600 mt-1">Status</p>
                 </div>
                 <div className="text-center p-4 bg-blue-50 rounded-lg">
-                  <Badge className={getPriorityColor(selectedActivity.priority)}>
+                  <Badge
+                    className={getPriorityColor(selectedActivity.priority)}
+                  >
                     {selectedActivity.priority}
                   </Badge>
                   <p className="text-xs text-gray-600 mt-1">Priority</p>
                 </div>
                 <div className="text-center p-4 bg-blue-50 rounded-lg">
-                  <Badge className={getCategoryColor(selectedActivity.category)}>
+                  <Badge
+                    className={getCategoryColor(selectedActivity.category)}
+                  >
                     {selectedActivity.category}
                   </Badge>
                   <p className="text-xs text-gray-600 mt-1">Category</p>
                 </div>
                 <div className="text-center p-4 bg-blue-50 rounded-lg">
-                  <p className="font-bold text-blue-800">€{selectedActivity.costPerActivity}</p>
+                  <p className="font-bold text-blue-800">
+                    €{selectedActivity.costPerActivity}
+                  </p>
                   <p className="text-xs text-gray-600 mt-1">Cost</p>
                 </div>
               </div>
@@ -1469,39 +2073,68 @@ export default function Activities() {
               {/* Activity Details */}
               <div className="grid grid-cols-2 gap-6">
                 <div>
-                  <h3 className="text-lg font-semibold mb-4 text-blue-800">Activity Information</h3>
+                  <h3 className="text-lg font-semibold mb-4 text-blue-800">
+                    Activity Information
+                  </h3>
                   <div className="space-y-3">
                     <div>
-                      <p className="text-sm font-medium text-gray-700">Activity Type</p>
-                      <p className="text-sm text-gray-600">{selectedActivity.activityType}</p>
+                      <p className="text-sm font-medium text-gray-700">
+                        Activity Type
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        {selectedActivity.activityType}
+                      </p>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-700">Date & Time</p>
-                      <p className="text-sm text-gray-600">{selectedActivity.date} at {selectedActivity.time}</p>
+                      <p className="text-sm font-medium text-gray-700">
+                        Date & Time
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        {selectedActivity.date} at {selectedActivity.time}
+                      </p>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-700">Responsible</p>
-                      <p className="text-sm text-gray-600">{selectedActivity.responsible}</p>
+                      <p className="text-sm font-medium text-gray-700">
+                        Responsible
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        {selectedActivity.responsible}
+                      </p>
                     </div>
                     {selectedActivity.deadline && (
                       <div>
-                        <p className="text-sm font-medium text-gray-700">Deadline</p>
-                        <p className="text-sm text-gray-600">{selectedActivity.deadline}</p>
+                        <p className="text-sm font-medium text-gray-700">
+                          Deadline
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          {selectedActivity.deadline}
+                        </p>
                       </div>
                     )}
                   </div>
                 </div>
 
                 <div>
-                  <h3 className="text-lg font-semibold mb-4 text-blue-800">Client & Ticket Info</h3>
+                  <h3 className="text-lg font-semibold mb-4 text-blue-800">
+                    Client & Ticket Info
+                  </h3>
                   <div className="space-y-3">
                     <div>
-                      <p className="text-sm font-medium text-gray-700">Linked Client</p>
+                      <p className="text-sm font-medium text-gray-700">
+                        Linked Client
+                      </p>
                       <div className="flex items-center space-x-2">
-                        <p className="text-sm text-gray-600">{selectedActivity.linkedClient} ({selectedActivity.unitType || selectedActivity.clientType})</p>
+                        <p className="text-sm text-gray-600">
+                          {selectedActivity.linkedClient} (
+                          {selectedActivity.unitType ||
+                            selectedActivity.clientType}
+                          )
+                        </p>
                         <button
                           className="flex items-center space-x-1 text-blue-600 hover:text-blue-800 cursor-pointer transition-colors text-xs hover:bg-blue-50 rounded px-2 py-1"
-                          onClick={() => handleOpenMaps(selectedActivity.linkedClient)}
+                          onClick={() =>
+                            handleOpenMaps(selectedActivity.linkedClient)
+                          }
                           title="View client location on Google Maps"
                         >
                           <MapPin className="h-3 w-3" />
@@ -1511,10 +2144,14 @@ export default function Activities() {
                     </div>
                     {selectedActivity.isTicket && (
                       <div>
-                        <p className="text-sm font-medium text-gray-700">Ticket Type</p>
+                        <p className="text-sm font-medium text-gray-700">
+                          Ticket Type
+                        </p>
                         <div className="flex items-center space-x-2">
                           {getTicketTypeIcon(selectedActivity.ticketType)}
-                          <span className="text-sm text-gray-600">{selectedActivity.ticketType}</span>
+                          <span className="text-sm text-gray-600">
+                            {selectedActivity.ticketType}
+                          </span>
                         </div>
                       </div>
                     )}
@@ -1533,11 +2170,17 @@ export default function Activities() {
               {/* Next Steps */}
               {selectedActivity.nextStep && (
                 <div>
-                  <h3 className="text-lg font-semibold mb-4 text-blue-800">Next Steps</h3>
+                  <h3 className="text-lg font-semibold mb-4 text-blue-800">
+                    Next Steps
+                  </h3>
                   <div className="p-4 bg-blue-50 rounded-lg">
-                    <p className="text-sm text-gray-700">{selectedActivity.nextStep}</p>
+                    <p className="text-sm text-gray-700">
+                      {selectedActivity.nextStep}
+                    </p>
                     {selectedActivity.nextStepDate && (
-                      <p className="text-xs text-gray-600 mt-2">Scheduled for: {selectedActivity.nextStepDate}</p>
+                      <p className="text-xs text-gray-600 mt-2">
+                        Scheduled for: {selectedActivity.nextStepDate}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -1545,21 +2188,32 @@ export default function Activities() {
 
               {/* Notes */}
               <div>
-                <h3 className="text-lg font-semibold mb-4 text-blue-800">Notes</h3>
+                <h3 className="text-lg font-semibold mb-4 text-blue-800">
+                  Notes
+                </h3>
                 <div className="p-4 bg-gray-50 rounded-lg">
-                  <p className="text-sm text-gray-700">{selectedActivity.notes}</p>
+                  <p className="text-sm text-gray-700">
+                    {selectedActivity.notes}
+                  </p>
                 </div>
               </div>
 
               {/* Attachments */}
               {selectedActivity.attachments.length > 0 && (
                 <div>
-                  <h3 className="text-lg font-semibold mb-4 text-blue-800">Attachments</h3>
+                  <h3 className="text-lg font-semibold mb-4 text-blue-800">
+                    Attachments
+                  </h3>
                   <div className="space-y-2">
                     {selectedActivity.attachments.map((attachment, idx) => (
-                      <div key={idx} className="flex items-center space-x-2 p-2 bg-blue-50 rounded border">
+                      <div
+                        key={idx}
+                        className="flex items-center space-x-2 p-2 bg-blue-50 rounded border"
+                      >
                         <Paperclip className="h-4 w-4 text-blue-600" />
-                        <span className="text-sm text-gray-700">{attachment}</span>
+                        <span className="text-sm text-gray-700">
+                          {attachment}
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -1568,23 +2222,33 @@ export default function Activities() {
 
               {/* Activity Log */}
               <div>
-                <h3 className="text-lg font-semibold mb-4 text-blue-800">Activity Log</h3>
+                <h3 className="text-lg font-semibold mb-4 text-blue-800">
+                  Activity Log
+                </h3>
                 <div className="space-y-2">
                   {(selectedActivity.activityLog || []).map((log, idx) => (
-                    <div key={idx} className="flex items-center space-x-2 p-2 bg-gray-50 rounded text-sm">
+                    <div
+                      key={idx}
+                      className="flex items-center space-x-2 p-2 bg-gray-50 rounded text-sm"
+                    >
                       <User className="h-3 w-3 text-gray-600" />
                       <span className="font-medium">{log.user}</span>
                       <span className="text-gray-600">{log.action}</span>
-                      <span className="text-gray-500 text-xs ml-auto">{log.timestamp}</span>
+                      <span className="text-gray-500 text-xs ml-auto">
+                        {log.timestamp}
+                      </span>
                     </div>
                   ))}
                 </div>
               </div>
             </div>
           )}
-          
+
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsViewDialogOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setIsViewDialogOpen(false)}
+            >
               Close
             </Button>
             <Button
@@ -1607,104 +2271,224 @@ export default function Activities() {
           <DialogHeader>
             <DialogTitle>Edit Activity/Ticket</DialogTitle>
             <DialogDescription>
-              Update activity or support ticket information with full tracking capabilities.
+              Update activity or support ticket information with full tracking
+              capabilities.
             </DialogDescription>
           </DialogHeader>
-          {user?.department === 'Support' && (selectedActivity?.isTicket || editActivity?.ticketType) && (
-            <div className="grid gap-6 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="edit-ticket-title">Title *</Label>
-                <Input id="edit-ticket-title" value={editTicketSupport.title} onChange={(e) => setEditTicketSupport(v => ({...v, title: e.target.value}))} placeholder="Short issue summary" />
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {user?.department === "Support" &&
+            (selectedActivity?.isTicket || editActivity?.ticketType) && (
+              <div className="grid gap-6 py-4">
                 <div className="space-y-2">
-                  <Label htmlFor="edit-ticket-client">Client *</Label>
-                  <Select value={editTicketSupport.client} onValueChange={(val) => setEditTicketSupport(v => ({...v, client: val}))}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="client name" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {clients.filter(c => c !== "All Clients").sort().map(c => (
-                        <SelectItem key={c} value={c}>{c}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Label htmlFor="edit-ticket-title">Title *</Label>
+                  <Input
+                    id="edit-ticket-title"
+                    value={editTicketSupport.title}
+                    onChange={(e) =>
+                      setEditTicketSupport((v) => ({
+                        ...v,
+                        title: e.target.value,
+                      }))
+                    }
+                    placeholder="Short issue summary"
+                  />
                 </div>
-                <div className="space-y-2">
-                  <Label>Assignees *</Label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {TEAM_MEMBERS.map(m => (
-                      <label key={m.name} className="flex items-center space-x-2 p-2 rounded bg-background/50">
-                        <input
-                          type="checkbox"
-                          className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500 rounded"
-                          checked={Array.isArray(editTicketSupport.assignees) ? editTicketSupport.assignees.includes(m.name) : false}
-                          onChange={(e) => {
-                            const current = Array.isArray(editTicketSupport.assignees) ? editTicketSupport.assignees : [];
-                            const updated = e.target.checked ? [...current, m.name] : current.filter(n => n !== m.name);
-                            setEditTicketSupport(v => ({...v, assignees: updated}));
-                          }}
-                        />
-                        <span className="text-sm">{m.name}</span>
-                      </label>
-                    ))}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-ticket-client">Client *</Label>
+                    <Select
+                      value={editTicketSupport.client}
+                      onValueChange={(val) =>
+                        setEditTicketSupport((v) => ({ ...v, client: val }))
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="client name" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {clients
+                          .filter((c) => c !== "All Clients")
+                          .sort()
+                          .map((c) => (
+                            <SelectItem key={c} value={c}>
+                              {c}
+                            </SelectItem>
+                          ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Assignees *</Label>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {TEAM_MEMBERS.map((m) => (
+                        <label
+                          key={m.name}
+                          className="flex items-center space-x-2 p-2 rounded bg-background/50"
+                        >
+                          <input
+                            type="checkbox"
+                            className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500 rounded"
+                            checked={
+                              Array.isArray(editTicketSupport.assignees)
+                                ? editTicketSupport.assignees.includes(m.name)
+                                : false
+                            }
+                            onChange={(e) => {
+                              const current = Array.isArray(
+                                editTicketSupport.assignees,
+                              )
+                                ? editTicketSupport.assignees
+                                : [];
+                              const updated = e.target.checked
+                                ? [...current, m.name]
+                                : current.filter((n) => n !== m.name);
+                              setEditTicketSupport((v) => ({
+                                ...v,
+                                assignees: updated,
+                              }));
+                            }}
+                          />
+                          <span className="text-sm">{m.name}</span>
+                        </label>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="edit-ticket-priority">Priority</Label>
-                  <Select value={editTicketSupport.priority} onValueChange={(val) => setEditTicketSupport(v => ({...v, priority: val}))}>
-                    <SelectTrigger className={editTicketSupport.priority ? getSupportPriorityColor(editTicketSupport.priority) + " bg-opacity-20" : ""}>
-                      <SelectValue placeholder="Select priority" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="urgent" className={getSupportPriorityColor('urgent') + ' hover:opacity-90'}>Urgent</SelectItem>
-                      <SelectItem value="high" className={getSupportPriorityColor('high') + ' hover:opacity-90'}>High</SelectItem>
-                      <SelectItem value="medium" className={getSupportPriorityColor('medium') + ' hover:opacity-90'}>Medium</SelectItem>
-                      <SelectItem value="low" className={getSupportPriorityColor('low') + ' hover:opacity-90'}>Low</SelectItem>
-                    </SelectContent>
-                  </Select>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-ticket-priority">Priority</Label>
+                    <Select
+                      value={editTicketSupport.priority}
+                      onValueChange={(val) =>
+                        setEditTicketSupport((v) => ({ ...v, priority: val }))
+                      }
+                    >
+                      <SelectTrigger
+                        className={
+                          editTicketSupport.priority
+                            ? getSupportPriorityColor(
+                                editTicketSupport.priority,
+                              ) + " bg-opacity-20"
+                            : ""
+                        }
+                      >
+                        <SelectValue placeholder="Select priority" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem
+                          value="urgent"
+                          className={
+                            getSupportPriorityColor("urgent") +
+                            " hover:opacity-90"
+                          }
+                        >
+                          Urgent
+                        </SelectItem>
+                        <SelectItem
+                          value="high"
+                          className={
+                            getSupportPriorityColor("high") +
+                            " hover:opacity-90"
+                          }
+                        >
+                          High
+                        </SelectItem>
+                        <SelectItem
+                          value="medium"
+                          className={
+                            getSupportPriorityColor("medium") +
+                            " hover:opacity-90"
+                          }
+                        >
+                          Medium
+                        </SelectItem>
+                        <SelectItem
+                          value="low"
+                          className={
+                            getSupportPriorityColor("low") + " hover:opacity-90"
+                          }
+                        >
+                          Low
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-ticket-category">Category</Label>
+                    <Select
+                      value={editTicketSupport.category}
+                      onValueChange={(val) =>
+                        setEditTicketSupport((v) => ({ ...v, category: val }))
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Bug">Bug</SelectItem>
+                        <SelectItem value="Question">Question</SelectItem>
+                        <SelectItem value="Feature">Feature</SelectItem>
+                        <SelectItem value="Training">Training</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="edit-ticket-category">Category</Label>
-                  <Select value={editTicketSupport.category} onValueChange={(val) => setEditTicketSupport(v => ({...v, category: val}))}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Bug">Bug</SelectItem>
-                      <SelectItem value="Question">Question</SelectItem>
-                      <SelectItem value="Feature">Feature</SelectItem>
-                      <SelectItem value="Training">Training</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Label htmlFor="edit-ticket-description">Description</Label>
+                  <Textarea
+                    id="edit-ticket-description"
+                    rows={4}
+                    value={editTicketSupport.description}
+                    onChange={(e) =>
+                      setEditTicketSupport((v) => ({
+                        ...v,
+                        description: e.target.value,
+                      }))
+                    }
+                    placeholder="Describe the issue..."
+                  />
+                </div>
+                <div className="flex items-center space-x-2 pt-2">
+                  <input
+                    id="edit-ticket-premium"
+                    type="checkbox"
+                    className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500 rounded"
+                    checked={editTicketSupport.premium}
+                    onChange={(e) =>
+                      setEditTicketSupport((v) => ({
+                        ...v,
+                        premium: e.target.checked,
+                      }))
+                    }
+                  />
+                  <Label htmlFor="edit-ticket-premium">Premium</Label>
                 </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="edit-ticket-description">Description</Label>
-                <Textarea id="edit-ticket-description" rows={4} value={editTicketSupport.description} onChange={(e) => setEditTicketSupport(v => ({...v, description: e.target.value}))} placeholder="Describe the issue..." />
-              </div>
-              <div className="flex items-center space-x-2 pt-2">
-                <input id="edit-ticket-premium" type="checkbox" className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500 rounded" checked={editTicketSupport.premium} onChange={(e) => setEditTicketSupport(v => ({...v, premium: e.target.checked}))} />
-                <Label htmlFor="edit-ticket-premium">Premium</Label>
-              </div>
-            </div>
-          )}
-          <div className={`grid gap-6 py-4 ${user?.department === 'Support' && (selectedActivity?.isTicket || editActivity?.ticketType) ? 'hidden' : ''}`}>
+            )}
+          <div
+            className={`grid gap-6 py-4 ${user?.department === "Support" && (selectedActivity?.isTicket || editActivity?.ticketType) ? "hidden" : ""}`}
+          >
             {/* Activity Type & Category */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="edit-activityType">Activity Type *</Label>
-                <Select value={editActivity.activityType} onValueChange={(value) => handleEditInputChange('activityType', value)}>
+                <Select
+                  value={editActivity.activityType}
+                  onValueChange={(value) =>
+                    handleEditInputChange("activityType", value)
+                  }
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Select activity type" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="Call">Call</SelectItem>
                     <SelectItem value="Email">Email</SelectItem>
-                    <SelectItem value="Online Meeting">Online Meeting</SelectItem>
-                    <SelectItem value="In-person Meeting">In-person Meeting</SelectItem>
+                    <SelectItem value="Online Meeting">
+                      Online Meeting
+                    </SelectItem>
+                    <SelectItem value="In-person Meeting">
+                      In-person Meeting
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -1719,10 +2503,17 @@ export default function Activities() {
                       name="editCategory"
                       value="Sales"
                       checked={editActivity.category === "Sales"}
-                      onChange={(e) => handleEditInputChange('category', e.target.value)}
+                      onChange={(e) =>
+                        handleEditInputChange("category", e.target.value)
+                      }
                       className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
                     />
-                    <Label htmlFor="edit-category-sales" className="text-sm font-medium">Sales</Label>
+                    <Label
+                      htmlFor="edit-category-sales"
+                      className="text-sm font-medium"
+                    >
+                      Sales
+                    </Label>
                   </div>
                   <div className="flex items-center space-x-2">
                     <input
@@ -1731,10 +2522,17 @@ export default function Activities() {
                       name="editCategory"
                       value="Support"
                       checked={editActivity.category === "Support"}
-                      onChange={(e) => handleEditInputChange('category', e.target.value)}
+                      onChange={(e) =>
+                        handleEditInputChange("category", e.target.value)
+                      }
                       className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
                     />
-                    <Label htmlFor="edit-category-support" className="text-sm font-medium">Support</Label>
+                    <Label
+                      htmlFor="edit-category-support"
+                      className="text-sm font-medium"
+                    >
+                      Support
+                    </Label>
                   </div>
                 </div>
               </div>
@@ -1744,14 +2542,24 @@ export default function Activities() {
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="edit-linkedClient">Linked Client *</Label>
-                <Select value={editActivity.linkedClient} onValueChange={(value) => handleEditInputChange('linkedClient', value)}>
+                <Select
+                  value={editActivity.linkedClient}
+                  onValueChange={(value) =>
+                    handleEditInputChange("linkedClient", value)
+                  }
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Select organization" />
                   </SelectTrigger>
                   <SelectContent>
-                    {clients.filter(c => c !== "All Clients").sort().map((c) => (
-                      <SelectItem key={c} value={c}>{c}</SelectItem>
-                    ))}
+                    {clients
+                      .filter((c) => c !== "All Clients")
+                      .sort()
+                      .map((c) => (
+                        <SelectItem key={c} value={c}>
+                          {c}
+                        </SelectItem>
+                      ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -1767,10 +2575,17 @@ export default function Activities() {
                       name="editUnitType"
                       value="Government"
                       checked={editActivity.unitType === "Government"}
-                      onChange={(e) => handleEditInputChange('unitType', e.target.value)}
+                      onChange={(e) =>
+                        handleEditInputChange("unitType", e.target.value)
+                      }
                       className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
                     />
-                    <Label htmlFor="edit-unit-government" className="text-sm font-medium">Government</Label>
+                    <Label
+                      htmlFor="edit-unit-government"
+                      className="text-sm font-medium"
+                    >
+                      Government
+                    </Label>
                   </div>
                   <div className="flex items-center space-x-2">
                     <input
@@ -1779,10 +2594,17 @@ export default function Activities() {
                       name="editUnitType"
                       value="Independent"
                       checked={editActivity.unitType === "Independent"}
-                      onChange={(e) => handleEditInputChange('unitType', e.target.value)}
+                      onChange={(e) =>
+                        handleEditInputChange("unitType", e.target.value)
+                      }
                       className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
                     />
-                    <Label htmlFor="edit-unit-independent" className="text-sm font-medium">Independent</Label>
+                    <Label
+                      htmlFor="edit-unit-independent"
+                      className="text-sm font-medium"
+                    >
+                      Independent
+                    </Label>
                   </div>
                 </div>
               </div>
@@ -1796,7 +2618,9 @@ export default function Activities() {
                   id="edit-date"
                   type="date"
                   value={editActivity.date}
-                  onChange={(e) => handleEditInputChange('date', e.target.value)}
+                  onChange={(e) =>
+                    handleEditInputChange("date", e.target.value)
+                  }
                 />
               </div>
               <div className="space-y-2">
@@ -1805,7 +2629,9 @@ export default function Activities() {
                   id="edit-time"
                   type="time"
                   value={editActivity.time}
-                  onChange={(e) => handleEditInputChange('time', e.target.value)}
+                  onChange={(e) =>
+                    handleEditInputChange("time", e.target.value)
+                  }
                 />
               </div>
             </div>
@@ -1818,18 +2644,32 @@ export default function Activities() {
                   <div key={member} className="flex items-center space-x-2">
                     <input
                       type="checkbox"
-                      id={`edit-responsible-${member.replace(' ', '-').toLowerCase()}`}
-                      checked={Array.isArray(editActivity.responsible) ? editActivity.responsible.includes(member) : false}
+                      id={`edit-responsible-${member.replace(" ", "-").toLowerCase()}`}
+                      checked={
+                        Array.isArray(editActivity.responsible)
+                          ? editActivity.responsible.includes(member)
+                          : false
+                      }
                       onChange={(e) => {
-                        const currentResponsible = Array.isArray(editActivity.responsible) ? editActivity.responsible : [];
+                        const currentResponsible = Array.isArray(
+                          editActivity.responsible,
+                        )
+                          ? editActivity.responsible
+                          : [];
                         const updatedResponsible = e.target.checked
                           ? [...currentResponsible, member]
-                          : currentResponsible.filter(m => m !== member);
-                        handleEditInputChange('responsible', updatedResponsible);
+                          : currentResponsible.filter((m) => m !== member);
+                        handleEditInputChange(
+                          "responsible",
+                          updatedResponsible,
+                        );
                       }}
                       className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500 rounded"
                     />
-                    <Label htmlFor={`edit-responsible-${member.replace(' ', '-').toLowerCase()}`} className="text-sm font-medium">
+                    <Label
+                      htmlFor={`edit-responsible-${member.replace(" ", "-").toLowerCase()}`}
+                      className="text-sm font-medium"
+                    >
                       {member}
                     </Label>
                   </div>
@@ -1841,29 +2681,87 @@ export default function Activities() {
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="edit-status">Status</Label>
-                <Select value={editActivity.status} onValueChange={(value) => handleEditInputChange('status', value)}>
+                <Select
+                  value={editActivity.status}
+                  onValueChange={(value) =>
+                    handleEditInputChange("status", value)
+                  }
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
-                      <SelectItem value="To Do" className={getStatusColor("To Do") + " hover:opacity-90"}>To Do</SelectItem>
-                      <SelectItem value="In Progress" className={getStatusColor("In Progress") + " hover:opacity-90"}>In Progress</SelectItem>
-                      <SelectItem value="Done" className={getStatusColor("Done") + " hover:opacity-90"}>Done</SelectItem>
-                      <SelectItem value="Resolved" className={getStatusColor("Resolved") + " hover:opacity-90"}>Resolved</SelectItem>
-                    </SelectContent>
+                    <SelectItem
+                      value="To Do"
+                      className={getStatusColor("To Do") + " hover:opacity-90"}
+                    >
+                      To Do
+                    </SelectItem>
+                    <SelectItem
+                      value="In Progress"
+                      className={
+                        getStatusColor("In Progress") + " hover:opacity-90"
+                      }
+                    >
+                      In Progress
+                    </SelectItem>
+                    <SelectItem
+                      value="Done"
+                      className={getStatusColor("Done") + " hover:opacity-90"}
+                    >
+                      Done
+                    </SelectItem>
+                    <SelectItem
+                      value="Resolved"
+                      className={
+                        getStatusColor("Resolved") + " hover:opacity-90"
+                      }
+                    >
+                      Resolved
+                    </SelectItem>
+                  </SelectContent>
                 </Select>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="edit-priority">Priority</Label>
-                <Select value={editActivity.priority} onValueChange={(value) => handleEditInputChange('priority', value)}>
+                <Select
+                  value={editActivity.priority}
+                  onValueChange={(value) =>
+                    handleEditInputChange("priority", value)
+                  }
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Select priority" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Low" className={getPriorityColor("Low") + " hover:opacity-90"}>Low</SelectItem>
-                    <SelectItem value="Medium" className={getPriorityColor("Medium") + " hover:opacity-90"}>Medium</SelectItem>
-                    <SelectItem value="High" className={getPriorityColor("High") + " hover:opacity-90"}>High</SelectItem>
-                    <SelectItem value="Urgent" className={getPriorityColor("Urgent") + " hover:opacity-90"}>Urgent</SelectItem>
+                    <SelectItem
+                      value="Low"
+                      className={getPriorityColor("Low") + " hover:opacity-90"}
+                    >
+                      Low
+                    </SelectItem>
+                    <SelectItem
+                      value="Medium"
+                      className={
+                        getPriorityColor("Medium") + " hover:opacity-90"
+                      }
+                    >
+                      Medium
+                    </SelectItem>
+                    <SelectItem
+                      value="High"
+                      className={getPriorityColor("High") + " hover:opacity-90"}
+                    >
+                      High
+                    </SelectItem>
+                    <SelectItem
+                      value="Urgent"
+                      className={
+                        getPriorityColor("Urgent") + " hover:opacity-90"
+                      }
+                    >
+                      Urgent
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -1873,7 +2771,9 @@ export default function Activities() {
                   id="edit-deadline"
                   type="date"
                   value={editActivity.deadline}
-                  onChange={(e) => handleEditInputChange('deadline', e.target.value)}
+                  onChange={(e) =>
+                    handleEditInputChange("deadline", e.target.value)
+                  }
                 />
               </div>
             </div>
@@ -1886,7 +2786,9 @@ export default function Activities() {
                   id="edit-reminderDate"
                   type="date"
                   value={editActivity.reminderDate}
-                  onChange={(e) => handleEditInputChange('reminderDate', e.target.value)}
+                  onChange={(e) =>
+                    handleEditInputChange("reminderDate", e.target.value)
+                  }
                 />
               </div>
               <div className="space-y-2">
@@ -1895,7 +2797,9 @@ export default function Activities() {
                   id="edit-nextStepDate"
                   type="date"
                   value={editActivity.nextStepDate}
-                  onChange={(e) => handleEditInputChange('nextStepDate', e.target.value)}
+                  onChange={(e) =>
+                    handleEditInputChange("nextStepDate", e.target.value)
+                  }
                 />
               </div>
             </div>
@@ -1907,7 +2811,9 @@ export default function Activities() {
                 id="edit-nextStep"
                 placeholder="Describe the next action to be taken"
                 value={editActivity.nextStep}
-                onChange={(e) => handleEditInputChange('nextStep', e.target.value)}
+                onChange={(e) =>
+                  handleEditInputChange("nextStep", e.target.value)
+                }
               />
             </div>
 
@@ -1920,7 +2826,9 @@ export default function Activities() {
                   type="number"
                   placeholder="0"
                   value={editActivity.costPerActivity}
-                  onChange={(e) => handleEditInputChange('costPerActivity', e.target.value)}
+                  onChange={(e) =>
+                    handleEditInputChange("costPerActivity", e.target.value)
+                  }
                 />
               </div>
               <div className="space-y-2 flex items-center gap-4 pt-6">
@@ -1929,7 +2837,9 @@ export default function Activities() {
                     type="checkbox"
                     id="edit-premiumSupport"
                     checked={editActivity.premiumSupport}
-                    onChange={(e) => handleEditInputChange('premiumSupport', e.target.checked)}
+                    onChange={(e) =>
+                      handleEditInputChange("premiumSupport", e.target.checked)
+                    }
                   />
                   <Label htmlFor="edit-premiumSupport">Premium</Label>
                 </div>
@@ -1943,19 +2853,28 @@ export default function Activities() {
                 id="edit-notes"
                 placeholder="Enter activity notes and details..."
                 value={editActivity.notes}
-                onChange={(e) => handleEditInputChange('notes', e.target.value)}
+                onChange={(e) => handleEditInputChange("notes", e.target.value)}
                 rows={3}
               />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setIsEditDialogOpen(false)}
+            >
               Cancel
             </Button>
-            <Button onClick={handleUpdateSupportTicket} className={`bg-blue-600 hover:bg-blue-700 ${user?.department === 'Support' && (selectedActivity?.isTicket || editActivity?.ticketType) ? '' : 'hidden'}`}>
+            <Button
+              onClick={handleUpdateSupportTicket}
+              className={`bg-blue-600 hover:bg-blue-700 ${user?.department === "Support" && (selectedActivity?.isTicket || editActivity?.ticketType) ? "" : "hidden"}`}
+            >
               Update Ticket
             </Button>
-            <Button onClick={handleUpdateActivity} className={`bg-blue-600 hover:bg-blue-700 ${user?.department === 'Support' && (selectedActivity?.isTicket || editActivity?.ticketType) ? 'hidden' : ''}`}>
+            <Button
+              onClick={handleUpdateActivity}
+              className={`bg-blue-600 hover:bg-blue-700 ${user?.department === "Support" && (selectedActivity?.isTicket || editActivity?.ticketType) ? "hidden" : ""}`}
+            >
               Update Activity
             </Button>
           </DialogFooter>
