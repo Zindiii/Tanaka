@@ -159,14 +159,12 @@ const teamDirectory = TEAM_MEMBER_NAMES;
 
 // Unified pipeline stages for Sales
 const STAGES = [
-  "New",
   "First contact",
   "interested",
   "Offer sent",
   "Accepted",
   "Contract signed",
   "implementation",
-  "Declined",
 ];
 
 // ---------------- Helpers ----------------
@@ -469,8 +467,6 @@ export default function Sales() {
   const orgToStage = (phase) => {
     const p = String(phase || "").toLowerCase();
     const map = {
-    new: "First contact",
-    declined: "First contact",
     "first contacted": "First contact",
     "first contact": "First contact",
     interested: "interested",
@@ -534,7 +530,20 @@ export default function Sales() {
   // Initialize/Sync leads from organizations (preserve user changes like stage)
   useEffect(() => {
     const today = new Date().toISOString().split("T")[0];
-    const baseFromOrgs = (organizations || []).map((o, idx) => {
+    const isActiveOrgPhase = (phase) => {
+      const p = String(phase || "").toLowerCase();
+      return [
+        "first contact",
+        "interested",
+        "offer sent",
+        "accepted",
+        "contract signed",
+        "implementation",
+      ].includes(p);
+    };
+    const baseFromOrgs = (organizations || [])
+      .filter((o) => isActiveOrgPhase(o?.phase))
+      .map((o, idx) => {
       const contactName = [
         o?.contactPerson?.firstName,
         o?.contactPerson?.surname,
