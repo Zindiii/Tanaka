@@ -47,7 +47,7 @@ const unitTypes = ["All Types", "Government", "Independent"];
 const organizationCategories = ["All Categories", "County", "Municipality", "City", "Sports Club", "SME", "Craftsmen", "Association"];
 const statuses = ["All Statuses", "Active", "Expired", "Potential", "Client", "Former Client", "Negotiation in Progress", "Not Contacted", "Rejected"];
 const phases = ["All Phases", "New", "First contact", "interested", "Offer sent", "Accepted", "Contract signed", "implementation", "Declined"];
-const nextPhases = ["All Next Phases", "Follow-up Call", "Proposal Submission", "Contract Signing", "Implementation", "Review Meeting", "Renewal Discussion"];
+const nextPhases = ["All Next Phases", "Reach Out", "Follow-up Call", "Proposal Submission", "Contract Signing", "Implementation", "Review Meeting", "Renewal Discussion"];
 const orgTeamMembers = ["Ana Marić", "Marko Petrović", "Petra Babić", "Luka Novak", "Sofia Antić"];
 
 const getStatusColor = (status) => {
