@@ -325,6 +325,16 @@ export default function Activities() {
     return activities;
   });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  React.useEffect(() => {
+    const reload = () => {
+      try {
+        const saved = localStorage.getItem("activitiesList");
+        setActivitiesList(saved ? JSON.parse(saved) : []);
+      } catch {}
+    };
+    window.addEventListener("activitiesListUpdated", reload);
+    return () => window.removeEventListener("activitiesListUpdated", reload);
+  }, []);
   const [newTicket, setNewTicket] = useState({
     title: "",
     client: "",
