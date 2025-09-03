@@ -365,7 +365,7 @@ export default function Support() {
     derivedTickets.length > 0 ? derivedTickets : supportTickets;
 
   const highPriorityTickets = allTickets.filter(
-    (ticket) => ticket.priority === "urgent" || ticket.priority === "high",
+    (ticket) => ticket.priority === "urgent",
   );
 
   const overdueTickets = allTickets.filter((ticket) => {
@@ -458,7 +458,7 @@ export default function Support() {
       );
     });
 
-  const showHighPriorityTickets = () => {
+  const showUrgentPriorityTickets = () => {
     setSelectedTickets(highPriorityTickets);
     setIsHighPriorityDialogOpen(true);
   };
@@ -936,7 +936,7 @@ export default function Support() {
         <CardContent>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             <Button
-              onClick={showHighPriorityTickets}
+              onClick={showUrgentPriorityTickets}
               className="w-full h-24 flex flex-col items-center justify-center gap-2 text-center bg-gradient-to-br from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700"
             >
               <AlertTriangle className="h-6 w-6" />
@@ -1388,7 +1388,7 @@ export default function Support() {
         </DialogContent>
       </Dialog>
 
-      {/* High Priority Tickets Dialog */}
+      {/* Urgent Priority Tickets Dialog */}
       <Dialog
         open={isHighPriorityDialogOpen}
         onOpenChange={setIsHighPriorityDialogOpen}
@@ -1397,10 +1397,10 @@ export default function Support() {
           <DialogHeader>
             <DialogTitle className="flex items-center space-x-2">
               <AlertTriangle className="h-5 w-5 text-red-600" />
-              <span>High Priority Tickets</span>
+              <span>Urgent Priority Tickets</span>
             </DialogTitle>
             <DialogDescription>
-              Urgent and high priority support tickets requiring immediate
+              Urgent priority support tickets requiring immediate
               attention
             </DialogDescription>
           </DialogHeader>
