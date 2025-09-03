@@ -129,6 +129,7 @@ export default function Dashboard() {
 
   // Load activities to derive user's tickets
   const [activitiesList, setActivitiesList] = useState([]);
+  const [supportTickets, setSupportTickets] = useState([]);
   useEffect(() => {
     try {
       const saved = localStorage.getItem("activitiesList");
@@ -144,6 +145,23 @@ export default function Dashboard() {
     };
     window.addEventListener("activitiesListUpdated", handler);
     return () => window.removeEventListener("activitiesListUpdated", handler);
+  }, []);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("supportTicketsList");
+      setSupportTickets(saved ? JSON.parse(saved) : []);
+    } catch {
+      setSupportTickets([]);
+    }
+    const handler = () => {
+      try {
+        const saved = localStorage.getItem("supportTicketsList");
+        setSupportTickets(saved ? JSON.parse(saved) : []);
+      } catch {}
+    };
+    window.addEventListener("supportTicketsUpdated", handler);
+    return () => window.removeEventListener("supportTicketsUpdated", handler);
   }, []);
 
   // Team recent activities: activities by teammates on your projects (excludes your own)
@@ -173,7 +191,8 @@ export default function Dashboard() {
         return isNaN(dt) ? 0 : dt;
       };
 
-      const list = (Array.isArray(activitiesList) ? activitiesList : [])
+      const base = user?.department === "Support" ? supportTickets : activitiesList;
+      const list = (Array.isArray(base) ? base : [])
         .filter((a) => a?.isTicket || a?.ticketType)
         // exclude tickets involving the current user
         .filter((a) => !isAssignedToCurrentUser(a?.responsible))
@@ -204,10 +223,11 @@ export default function Dashboard() {
     } catch {
       return [];
     }
-  }, [user?.department, user?.name, teamActivityFeed, activitiesList, getAllUsers]);
+  }, [user?.department, user?.name, teamActivityFeed, activitiesList, supportTickets, getAllUsers]);
 
   // Upcoming tasks: current user's tickets
-  const upcomingTasks = (Array.isArray(activitiesList) ? activitiesList : [])
+  const upcomingTasksBase = user?.department === "Support" ? supportTickets : activitiesList;
+  const upcomingTasks = (Array.isArray(upcomingTasksBase) ? upcomingTasksBase : [])
     .filter((a) => a?.isTicket || a?.ticketType)
     .filter((a) => {
       const resp = a?.responsible;
@@ -429,7 +449,7 @@ export default function Dashboard() {
                 <span>Your Upcoming Tasks</span>
               </CardTitle>
               <Button variant="ghost" size="sm" asChild>
-                <Link to="/activities">
+                <Link to={user?.department === 'Support' ? '/support' : '/activities'}>
                   View All <ArrowRight className="h-4 w-4 ml-1" />
                 </Link>
               </Button>
