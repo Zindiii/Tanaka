@@ -332,8 +332,24 @@ export default function Activities() {
         setActivitiesList(saved ? JSON.parse(saved) : []);
       } catch {}
     };
+    const onVisibility = () => {
+      if (!document.hidden) reload();
+    };
+    const onStorage = (e) => {
+      if (e.key === "activitiesList") {
+        try {
+          setActivitiesList(e.newValue ? JSON.parse(e.newValue) : []);
+        } catch {}
+      }
+    };
     window.addEventListener("activitiesListUpdated", reload);
-    return () => window.removeEventListener("activitiesListUpdated", reload);
+    document.addEventListener("visibilitychange", onVisibility);
+    window.addEventListener("storage", onStorage);
+    return () => {
+      window.removeEventListener("activitiesListUpdated", reload);
+      document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("storage", onStorage);
+    };
   }, []);
   const [newTicket, setNewTicket] = useState({
     title: "",
