@@ -187,6 +187,9 @@ export default function Organization() {
     fax: "",
     email: "",
     websites: "",
+    contactPersons: [
+      { firstName: "", surname: "", role: "", phone: "", email: "" }
+    ],
     contactFirstName: "",
     contactSurname: "",
     contactRole: "",
@@ -423,6 +426,24 @@ export default function Organization() {
   };
 
   const handleEditOrganization = (org) => {
+    const contacts = Array.isArray(org.contactPersons)
+      ? org.contactPersons.map(c => ({
+          firstName: c.firstName || "",
+          surname: c.surname || "",
+          role: c.role || "",
+          phone: c.phone || "",
+          email: c.email || "",
+        }))
+      : org.contactPerson
+        ? [{
+            firstName: org.contactPerson.firstName || "",
+            surname: org.contactPerson.surname || "",
+            role: org.contactPerson.role || "",
+            phone: org.contactPerson.phone || "",
+            email: org.email || "",
+          }]
+        : [{ firstName: "", surname: "", role: "", phone: "", email: "" }];
+    const primary = contacts[0] || { firstName: "", surname: "", role: "", phone: "" };
     setEditFormData({
       id: org.id,
       organizationName: org.organizationName,
@@ -438,10 +459,11 @@ export default function Organization() {
       fax: org.fax || "",
       email: org.email || "",
       websites: org.websites?.join(", ") || "",
-      contactFirstName: org.contactPerson?.firstName || "",
-      contactSurname: org.contactPerson?.surname || "",
-      contactRole: org.contactPerson?.role || "",
-      contactPhone: org.contactPerson?.phone || "",
+      contactPersons: contacts,
+      contactFirstName: primary.firstName || "",
+      contactSurname: primary.surname || "",
+      contactRole: primary.role || "",
+      contactPhone: primary.phone || "",
       category: org.category,
       responsibleMembers: org.responsibleMembers || [],
       premiumSupport: !!org.premiumSupport,
@@ -464,6 +486,26 @@ export default function Organization() {
       else if (editFormData.city) category = "City";
     }
 
+    const contactsArr = Array.isArray(editFormData.contactPersons)
+      ? editFormData.contactPersons
+          .map(c => ({
+            firstName: c.firstName?.trim() || "",
+            surname: c.surname?.trim() || "",
+            role: c.role?.trim() || "",
+            phone: c.phone?.trim() || "",
+            email: c.email?.trim() || "",
+          }))
+          .filter(c => c.firstName || c.surname || c.phone || c.email)
+      : [];
+    const legacyPrimary = {
+      firstName: editFormData.contactFirstName?.trim() || "",
+      surname: editFormData.contactSurname?.trim() || "",
+      role: editFormData.contactRole?.trim() || "",
+      phone: editFormData.contactPhone?.trim() || "",
+      email: "",
+    };
+    const primaryContact = contactsArr[0] || legacyPrimary;
+
     const updatedOrganization = {
       ...organizations.find(o => o.id === editFormData.id),
       organizationName: editFormData.organizationName,
@@ -481,11 +523,12 @@ export default function Organization() {
       email: editFormData.email,
       websites: editFormData.websites.split(',').map(w => w.trim()).filter(w => w),
       contactPerson: {
-        firstName: editFormData.contactFirstName,
-        surname: editFormData.contactSurname,
-        role: editFormData.contactRole,
-        phone: editFormData.contactPhone
+        firstName: primaryContact.firstName,
+        surname: primaryContact.surname,
+        role: primaryContact.role,
+        phone: primaryContact.phone
       },
+      contactPersons: contactsArr,
       responsibleMembers: editFormData.responsibleMembers,
       premiumSupport: !!editFormData.premiumSupport,
       notes: editFormData.notes,
