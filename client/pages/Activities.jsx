@@ -577,10 +577,9 @@ export default function Activities() {
       responsibleString.toLowerCase().includes(searchTerm.toLowerCase()) ||
       activity.notes.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesType = isSupport
-      ? selectedType === "All Categories" ||
-        activity.ticketType === selectedType
+      ? selectedType === "All Categories" || activity.ticketType === selectedType
       : selectedType === "All Types" || activity.activityType === selectedType;
-    const matchesCategory = isSupport ? true : true;
+    const matchesCategory = true;
     const matchesPremium = isSupport
       ? selectedPremiumClient === "All" ||
         activity.premiumSupport === (selectedPremiumClient === "Premium")
@@ -588,16 +587,14 @@ export default function Activities() {
     const matchesStatus =
       selectedStatus === "All Statuses" || activity.status === selectedStatus;
     const matchesMember =
-      selectedMember === "All Members" ||
-      responsibleString.includes(selectedMember);
+      selectedMember === "All Members" || responsibleString.includes(selectedMember);
     const matchesPriority =
-      selectedPriority === "All Priorities" ||
-      activity.priority === selectedPriority;
+      selectedPriority === "All Priorities" || activity.priority === selectedPriority;
     const matchesClient =
-      selectedClient === "All Clients" ||
-      activity.linkedClient === selectedClient;
+      selectedClient === "All Clients" || activity.linkedClient === selectedClient;
     const matchesFromDate = !fromDate || activity.date >= fromDate;
     const matchesToDate = !toDate || activity.date <= toDate;
+    const matchesTicketVisibility = isSupport ? true : !(activity?.isTicket || activity?.ticketType);
 
     return (
       matchesSearch &&
@@ -609,7 +606,8 @@ export default function Activities() {
       matchesPriority &&
       matchesClient &&
       matchesFromDate &&
-      matchesToDate
+      matchesToDate &&
+      matchesTicketVisibility
     );
   });
 
