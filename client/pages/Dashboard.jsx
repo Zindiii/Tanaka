@@ -123,7 +123,7 @@ const allUpcomingTasks = [
 ];
 
 export default function Dashboard() {
-  const { user } = useAuth();
+  const { user, getAllUsers } = useAuth();
   const { teamActivityFeed, hasProjects, userProjects } =
     useTeamActivityFeed(3);
 
@@ -147,7 +147,64 @@ export default function Dashboard() {
   }, []);
 
   // Team recent activities: activities by teammates on your projects (excludes your own)
-  const recentTeamActivities = teamActivityFeed;
+  // For Support users, show recent tickets assigned to other support users (excluding the current user)
+  const recentTeamActivities = useMemo(() => {
+    if (user?.department !== "Support") return teamActivityFeed;
+
+    try {
+      const allUsers = typeof getAllUsers === "function" ? getAllUsers() : [];
+      const supportNames = new Set(
+        Array.isArray(allUsers)
+          ? allUsers.filter((u) => u?.department === "Support").map((u) => u.name)
+          : [],
+      );
+
+      const isAssignedToCurrentUser = (resp) => {
+        if (Array.isArray(resp)) return resp.includes(user?.name);
+        if (typeof resp === "string") return resp === (user?.name || "");
+        return false;
+      };
+
+      const parseTime = (x) => {
+        if (x?.deadline) return new Date(`${x.deadline}T23:59:59`).getTime();
+        const t = x?.time || "00:00";
+        const d = x?.date || "";
+        const dt = new Date(`${d}T${t}:00`).getTime();
+        return isNaN(dt) ? 0 : dt;
+      };
+
+      const list = (Array.isArray(activitiesList) ? activitiesList : [])
+        .filter((a) => a?.isTicket || a?.ticketType)
+        // exclude tickets involving the current user
+        .filter((a) => !isAssignedToCurrentUser(a?.responsible))
+        // include only tickets assigned to support users
+        .filter((a) => {
+          const resp = a?.responsible;
+          if (Array.isArray(resp)) return resp.some((n) => supportNames.has(n));
+          if (typeof resp === "string") return supportNames.has(resp);
+          return false;
+        })
+        .sort((a, b) => parseTime(b) - parseTime(a))
+        .slice(0, 3)
+        .map((a) => ({
+          id: a.id,
+          client: a.linkedClient || "",
+          type: a.ticketType || "Ticket",
+          time: a.deadline
+            ? `Due: ${a.deadline}`
+            : `${a.date || ""}${a.time ? " • " + a.time : ""}`,
+          responsiblePerson: Array.isArray(a.responsible)
+            ? (a.responsible.find((n) => n !== user?.name) || a.responsible[0] || "")
+            : a.responsible || "",
+          status: (a.status || "To Do").toString().toLowerCase(),
+          icon: Settings,
+        }));
+
+      return list;
+    } catch {
+      return [];
+    }
+  }, [user?.department, user?.name, teamActivityFeed, activitiesList, getAllUsers]);
 
   // Upcoming tasks: current user's tickets
   const upcomingTasks = (Array.isArray(activitiesList) ? activitiesList : [])
@@ -300,7 +357,7 @@ export default function Dashboard() {
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center space-x-2">
                 <Activity className="h-5 w-5" />
-                <span>Team Recent Activities</span>
+                <span>{user?.department === "Support" ? "Team Recent Tickets" : "Team Recent Activities"}</span>
               </CardTitle>
               {user?.department !== 'Support' && (
                 <Button variant="ghost" size="sm" asChild>
