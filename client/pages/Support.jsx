@@ -1705,7 +1705,7 @@ export default function Support() {
             <DialogDescription>
               {isEditingTicket
                 ? "Update the support ticket. Changes will also appear in Activities."
-                : "Create a new support ticket. It will also appear in Activities."}
+                : "Create a new support ticket."}
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-2">
