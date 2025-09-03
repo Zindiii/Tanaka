@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { TEAM_MEMBERS } from "@/constants/teamMembers";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLocation } from "react-router-dom";
 import {
   Card,
   CardContent,
@@ -259,6 +260,7 @@ const formatTimeAgo = (dateString) => {
 
 export default function Support() {
   const { user } = useAuth();
+  const location = useLocation();
   const [selectedTickets, setSelectedTickets] = useState([]);
   const [selectedTeamMember, setSelectedTeamMember] = useState(null);
   const [isHighPriorityDialogOpen, setIsHighPriorityDialogOpen] =
@@ -266,6 +268,12 @@ export default function Support() {
   const [isOverdueDialogOpen, setIsOverdueDialogOpen] = useState(false);
   const [isPremiumDialogOpen, setIsPremiumDialogOpen] = useState(false);
   const [isRegisterDialogOpen, setIsRegisterDialogOpen] = useState(false);
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(location.search);
+      if (params.get("register")) setIsRegisterDialogOpen(true);
+    } catch {}
+  }, [location.search]);
   const [isTicketViewOpen, setIsTicketViewOpen] = useState(false);
   const [selectedTicketActivity, setSelectedTicketActivity] = useState(null);
   const [isEditingTicket, setIsEditingTicket] = useState(false);
