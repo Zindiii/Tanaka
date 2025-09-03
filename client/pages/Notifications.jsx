@@ -458,7 +458,7 @@ export default function NotificationsPage({ getData = getInitialData }) {
       {/* Enhanced Tabs */}
       <div className="mb-6 overflow-x-auto">
         <div className="flex items-center gap-2 text-sm whitespace-nowrap">
-          {["All", "Unread", "High Priority", "Mentions", "Sales", "Support", "System"].map((t) => (
+          {["All", "Unread"].map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
