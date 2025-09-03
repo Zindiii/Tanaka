@@ -304,19 +304,19 @@ export default function Support() {
   const [activitiesList, setActivitiesList] = useState([]);
   useEffect(() => {
     try {
-      const saved = localStorage.getItem("activitiesList");
+      const saved = localStorage.getItem("supportTicketsList");
       setActivitiesList(saved ? JSON.parse(saved) : []);
     } catch {
       setActivitiesList([]);
     }
     const handler = () => {
       try {
-        const saved = localStorage.getItem("activitiesList");
+        const saved = localStorage.getItem("supportTicketsList");
         setActivitiesList(saved ? JSON.parse(saved) : []);
       } catch {}
     };
-    window.addEventListener("activitiesListUpdated", handler);
-    return () => window.removeEventListener("activitiesListUpdated", handler);
+    window.addEventListener("supportTicketsUpdated", handler);
+    return () => window.removeEventListener("supportTicketsUpdated", handler);
   }, []);
 
   const derivedTickets = (Array.isArray(activitiesList) ? activitiesList : [])
@@ -394,7 +394,7 @@ export default function Support() {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedType, setSelectedType] = useState("All Categories");
-  const [selectedPremiumClient, setSelectedPremiumClient] = useState("Premium");
+  const [selectedPremiumClient, setSelectedPremiumClient] = useState("All");
   const [selectedStatus, setSelectedStatus] = useState("All Statuses");
   const [selectedMember, setSelectedMember] = useState("All Members");
   const [selectedPriority, setSelectedPriority] = useState("All Priorities");
@@ -475,7 +475,7 @@ export default function Support() {
 
   const toggleActivityResolved = (id) => {
     try {
-      const saved = localStorage.getItem("activitiesList");
+      const saved = localStorage.getItem("supportTicketsList");
       const list = saved ? JSON.parse(saved) : [];
       const updated = Array.isArray(list)
         ? list.map((a) => {
@@ -503,8 +503,8 @@ export default function Support() {
             };
           })
         : [];
-      localStorage.setItem("activitiesList", JSON.stringify(updated));
-      window.dispatchEvent(new Event("activitiesListUpdated"));
+      localStorage.setItem("supportTicketsList", JSON.stringify(updated));
+      window.dispatchEvent(new Event("supportTicketsUpdated"));
     } catch {}
   };
 
@@ -516,14 +516,14 @@ export default function Support() {
     );
     if (!should) return;
     try {
-      const saved = localStorage.getItem("activitiesList");
+      const saved = localStorage.getItem("supportTicketsList");
       const list = saved ? JSON.parse(saved) : [];
       const ids = new Set(filteredSupportActivities.map((a) => a.id));
       const updated = Array.isArray(list)
         ? list.filter((a) => !ids.has(a.id))
         : [];
-      localStorage.setItem("activitiesList", JSON.stringify(updated));
-      window.dispatchEvent(new Event("activitiesListUpdated"));
+      localStorage.setItem("supportTicketsList", JSON.stringify(updated));
+      window.dispatchEvent(new Event("supportTicketsUpdated"));
       setSelectedIds((prev) => prev.filter((id) => !ids.has(id)));
       setSelectionMode(false);
     } catch {}
@@ -735,17 +735,17 @@ export default function Support() {
                   );
                   if (!should) return;
                   try {
-                    const saved = localStorage.getItem("activitiesList");
+                    const saved = localStorage.getItem("supportTicketsList");
                     const list = saved ? JSON.parse(saved) : [];
                     const idSet = new Set(selectedIds);
                     const updated = Array.isArray(list)
                       ? list.filter((a) => !idSet.has(a.id))
                       : [];
                     localStorage.setItem(
-                      "activitiesList",
+                      "supportTicketsList",
                       JSON.stringify(updated),
                     );
-                    window.dispatchEvent(new Event("activitiesListUpdated"));
+                    window.dispatchEvent(new Event("supportTicketsUpdated"));
                     setSelectedIds([]);
                     setSelectionMode(false);
                   } catch {}
@@ -2011,7 +2011,7 @@ export default function Support() {
                   return;
                 }
                 try {
-                  const saved = localStorage.getItem("activitiesList");
+                  const saved = localStorage.getItem("supportTicketsList");
                   const list = saved ? JSON.parse(saved) : [];
                   const mapPriority = (p) =>
                     p === "urgent"
@@ -2043,10 +2043,10 @@ export default function Support() {
                         )
                       : [];
                     localStorage.setItem(
-                      "activitiesList",
+                      "supportTicketsList",
                       JSON.stringify(updated),
                     );
-                    window.dispatchEvent(new Event("activitiesListUpdated"));
+                    window.dispatchEvent(new Event("supportTicketsUpdated"));
                     setIsRegisterDialogOpen(false);
                     setIsEditingTicket(false);
                     setEditingActivityId(null);
@@ -2100,10 +2100,10 @@ export default function Support() {
                     };
                     const updated = [activity, ...list];
                     localStorage.setItem(
-                      "activitiesList",
+                      "supportTicketsList",
                       JSON.stringify(updated),
                     );
-                    window.dispatchEvent(new Event("activitiesListUpdated"));
+                    window.dispatchEvent(new Event("supportTicketsUpdated"));
                     setIsRegisterDialogOpen(false);
                     setNewTicket({
                       title: "",
