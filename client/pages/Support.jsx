@@ -1756,7 +1756,7 @@ export default function Support() {
                     <SelectValue placeholder="Select source" />
                   </SelectTrigger>
                   <SelectContent>
-                    {["website", "Refferral", "call", "partner", "Event"].map(
+                    {["Call", "E-mail", "Whatsapp"].map(
                       (s) => (
                         <SelectItem key={s} value={s}>
                           {s}
@@ -1838,11 +1838,15 @@ export default function Support() {
                 </SelectTrigger>
                 <SelectContent>
                   {[
-                    "4S System",
-                    "Client Portal",
-                    "Mobile App",
-                    "Analytics Dashboard",
-                    "Integrations",
+                    "SOM Natječaj",
+                    "SOM Udruge",
+                    "SOM Sport",
+                    "SOM Home",
+                    "SOM Jed. nabava",
+                    "SOM System",
+                    "Triumphy Natječaj",
+                    "Triumphy Udruge",
+                    "Triumphy Sport",
                   ].map((a) => (
                     <SelectItem key={a} value={a}>
                       {a}
