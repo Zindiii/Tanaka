@@ -604,7 +604,7 @@ export default function Activities() {
       selectedClient === "All Clients" || activity.linkedClient === selectedClient;
     const matchesFromDate = !fromDate || activity.date >= fromDate;
     const matchesToDate = !toDate || activity.date <= toDate;
-    const matchesTicketVisibility = isSupport ? true : !(activity?.isTicket || activity?.ticketType);
+    const matchesTicketVisibility = isSupport ? true : !activity?.isTicket;
 
     return (
       matchesSearch &&
