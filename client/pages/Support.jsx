@@ -593,7 +593,7 @@ export default function Support() {
             <p className="text-sm text-gray-600">Open Tickets</p>
             <div className="mt-2">
               <Badge className="bg-red-100 text-red-800 text-xs">
-                {highPriorityTickets.length} High Priority
+                {highPriorityTickets.length} Urgent Priority
               </Badge>
             </div>
           </CardContent>
