@@ -612,10 +612,35 @@ export default function Activities() {
   });
 
   const handleInputChange = (field, value) => {
-    setNewActivity((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+    setNewActivity((prev) => {
+      const next = { ...prev, [field]: value };
+      if (field === "deadline") {
+        if (!value) {
+          next.reminderDate = "";
+          next.nextStepDate = "";
+        } else {
+          try {
+            const [y, m, d] = String(value).split("-").map((n) => parseInt(n, 10));
+            const base = new Date(y, (m || 1) - 1, d || 1);
+            if (!isNaN(base.getTime())) {
+              const fmt = (date) => {
+                const yy = date.getFullYear();
+                const mm = String(date.getMonth() + 1).padStart(2, "0");
+                const dd = String(date.getDate()).padStart(2, "0");
+                return `${yy}-${mm}-${dd}`;
+              };
+              const reminder = new Date(base);
+              reminder.setDate(reminder.getDate() - 2);
+              const nextStep = new Date(base);
+              nextStep.setDate(nextStep.getDate() + 1);
+              next.reminderDate = fmt(reminder);
+              next.nextStepDate = fmt(nextStep);
+            }
+          } catch {}
+        }
+      }
+      return next;
+    });
   };
 
   const handleAddActivity = () => {
