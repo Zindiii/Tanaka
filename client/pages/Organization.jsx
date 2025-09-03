@@ -1553,7 +1553,7 @@ export default function Organization() {
                     checked={!!editFormData.premiumSupport}
                     onChange={(e) => setEditFormData({ ...editFormData, premiumSupport: e.target.checked })}
                   />
-                  <Label htmlFor="edit-premiumSupport">Premium Support</Label>
+                  <Label htmlFor="edit-premiumSupport">Premium</Label>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="edit-status">Status</Label>
@@ -1674,46 +1674,107 @@ export default function Organization() {
               </div>
             </div>
 
-            {/* Contact Person Details */}
+            {/* Contact Persons */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-blue-800">Contact Person Details</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="edit-contactFirstName">First Name</Label>
-                  <Input
-                    id="edit-contactFirstName"
-                    value={editFormData.contactFirstName}
-                    onChange={(e) => setEditFormData({...editFormData, contactFirstName: e.target.value})}
-                    placeholder="Enter first name"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="edit-contactSurname">Surname</Label>
-                  <Input
-                    id="edit-contactSurname"
-                    value={editFormData.contactSurname}
-                    onChange={(e) => setEditFormData({...editFormData, contactSurname: e.target.value})}
-                    placeholder="Enter surname"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="edit-contactRole">Role</Label>
-                  <Input
-                    id="edit-contactRole"
-                    value={editFormData.contactRole}
-                    onChange={(e) => setEditFormData({...editFormData, contactRole: e.target.value})}
-                    placeholder="Enter role/position"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="edit-contactPhone">Phone Number</Label>
-                  <Input
-                    id="edit-contactPhone"
-                    value={editFormData.contactPhone}
-                    onChange={(e) => setEditFormData({...editFormData, contactPhone: e.target.value})}
-                    placeholder="Enter contact phone number"
-                  />
-                </div>
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-blue-800">Contact Persons</h3>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="border-blue-200 text-blue-700 hover:bg-blue-50"
+                  onClick={() => setEditFormData({
+                    ...editFormData,
+                    contactPersons: [...(editFormData.contactPersons || []), { firstName: "", surname: "", role: "", phone: "", email: "" }]
+                  })}
+                >
+                  Add Contact
+                </Button>
+              </div>
+              <div className="space-y-4">
+                {(editFormData.contactPersons || []).map((c, idx) => (
+                  <Card key={idx} className="p-4 border-blue-100">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-sm font-medium text-blue-800">Contact #{idx + 1}</span>
+                      {idx > 0 && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          className="text-red-600 hover:text-red-700"
+                          onClick={() => {
+                            const next = [...(editFormData.contactPersons || [])];
+                            next.splice(idx, 1);
+                            setEditFormData({ ...editFormData, contactPersons: next });
+                          }}
+                        >
+                          Remove
+                        </Button>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label>First Name</Label>
+                        <Input
+                          value={c.firstName}
+                          onChange={(e) => {
+                            const next = [...(editFormData.contactPersons || [])];
+                            next[idx] = { ...next[idx], firstName: e.target.value };
+                            setEditFormData({ ...editFormData, contactPersons: next });
+                          }}
+                          placeholder="First name"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Surname</Label>
+                        <Input
+                          value={c.surname}
+                          onChange={(e) => {
+                            const next = [...(editFormData.contactPersons || [])];
+                            next[idx] = { ...next[idx], surname: e.target.value };
+                            setEditFormData({ ...editFormData, contactPersons: next });
+                          }}
+                          placeholder="Surname"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Role</Label>
+                        <Input
+                          value={c.role}
+                          onChange={(e) => {
+                            const next = [...(editFormData.contactPersons || [])];
+                            next[idx] = { ...next[idx], role: e.target.value };
+                            setEditFormData({ ...editFormData, contactPersons: next });
+                          }}
+                          placeholder="Role/position"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Phone</Label>
+                        <Input
+                          value={c.phone}
+                          onChange={(e) => {
+                            const next = [...(editFormData.contactPersons || [])];
+                            next[idx] = { ...next[idx], phone: e.target.value };
+                            setEditFormData({ ...editFormData, contactPersons: next });
+                          }}
+                          placeholder="Phone number"
+                        />
+                      </div>
+                      <div className="space-y-2 md:col-span-2">
+                        <Label>Email</Label>
+                        <Input
+                          type="email"
+                          value={c.email}
+                          onChange={(e) => {
+                            const next = [...(editFormData.contactPersons || [])];
+                            next[idx] = { ...next[idx], email: e.target.value };
+                            setEditFormData({ ...editFormData, contactPersons: next });
+                          }}
+                          placeholder="Email address"
+                        />
+                      </div>
+                    </div>
+                  </Card>
+                ))}
               </div>
             </div>
 
