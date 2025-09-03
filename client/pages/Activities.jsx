@@ -2491,7 +2491,7 @@ export default function Activities() {
                 </Select>
               </div>
               {/* Category - Horizontal Radio Buttons */}
-              <div className="space-y-3">
+              <div className={`space-y-3 ${user?.department !== "Support" ? "hidden" : ""}`}>
                 <Label>Category *</Label>
                 <div className="flex space-x-6">
                   <div className="flex items-center space-x-2">
@@ -2542,9 +2542,27 @@ export default function Activities() {
                 <Label htmlFor="edit-linkedClient">Linked Client *</Label>
                 <Select
                   value={editActivity.linkedClient}
-                  onValueChange={(value) =>
-                    handleEditInputChange("linkedClient", value)
-                  }
+                  onValueChange={(value) => {
+                    let premium = false;
+                    try {
+                      const savedLeads = localStorage.getItem("sales_leads");
+                      const leads = savedLeads ? JSON.parse(savedLeads) : [];
+                      const match = Array.isArray(leads)
+                        ? leads.find((l) => l?.name === value)
+                        : null;
+                      if (match && typeof match.isPremium === "boolean") premium = !!match.isPremium;
+                      if (!premium) {
+                        const savedOrgs = localStorage.getItem("organizationData");
+                        const orgs = savedOrgs ? JSON.parse(savedOrgs) : [];
+                        const org = Array.isArray(orgs)
+                          ? orgs.find((o) => o?.organizationName === value)
+                          : null;
+                        if (org && typeof org.premiumSupport === "boolean") premium = !!org.premiumSupport;
+                      }
+                    } catch {}
+                    handleEditInputChange("linkedClient", value);
+                    handleEditInputChange("premiumSupport", premium);
+                  }}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select organization" />
@@ -2818,7 +2836,7 @@ export default function Activities() {
             {/* Activity Details */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="edit-costPerActivity">Cost (€)</Label>
+                <Label htmlFor="edit-costPerActivity">Cost (��)</Label>
                 <Input
                   id="edit-costPerActivity"
                   type="number"
