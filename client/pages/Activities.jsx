@@ -325,6 +325,32 @@ export default function Activities() {
     return activities;
   });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  React.useEffect(() => {
+    const reload = () => {
+      try {
+        const saved = localStorage.getItem("activitiesList");
+        setActivitiesList(saved ? JSON.parse(saved) : []);
+      } catch {}
+    };
+    const onVisibility = () => {
+      if (!document.hidden) reload();
+    };
+    const onStorage = (e) => {
+      if (e.key === "activitiesList") {
+        try {
+          setActivitiesList(e.newValue ? JSON.parse(e.newValue) : []);
+        } catch {}
+      }
+    };
+    window.addEventListener("activitiesListUpdated", reload);
+    document.addEventListener("visibilitychange", onVisibility);
+    window.addEventListener("storage", onStorage);
+    return () => {
+      window.removeEventListener("activitiesListUpdated", reload);
+      document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("storage", onStorage);
+    };
+  }, []);
   const [newTicket, setNewTicket] = useState({
     title: "",
     client: "",
@@ -577,10 +603,9 @@ export default function Activities() {
       responsibleString.toLowerCase().includes(searchTerm.toLowerCase()) ||
       activity.notes.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesType = isSupport
-      ? selectedType === "All Categories" ||
-        activity.ticketType === selectedType
+      ? selectedType === "All Categories" || activity.ticketType === selectedType
       : selectedType === "All Types" || activity.activityType === selectedType;
-    const matchesCategory = isSupport ? true : true;
+    const matchesCategory = true;
     const matchesPremium = isSupport
       ? selectedPremiumClient === "All" ||
         activity.premiumSupport === (selectedPremiumClient === "Premium")
@@ -588,16 +613,14 @@ export default function Activities() {
     const matchesStatus =
       selectedStatus === "All Statuses" || activity.status === selectedStatus;
     const matchesMember =
-      selectedMember === "All Members" ||
-      responsibleString.includes(selectedMember);
+      selectedMember === "All Members" || responsibleString.includes(selectedMember);
     const matchesPriority =
-      selectedPriority === "All Priorities" ||
-      activity.priority === selectedPriority;
+      selectedPriority === "All Priorities" || activity.priority === selectedPriority;
     const matchesClient =
-      selectedClient === "All Clients" ||
-      activity.linkedClient === selectedClient;
+      selectedClient === "All Clients" || activity.linkedClient === selectedClient;
     const matchesFromDate = !fromDate || activity.date >= fromDate;
     const matchesToDate = !toDate || activity.date <= toDate;
+    const matchesTicketVisibility = isSupport ? true : !activity?.isTicket;
 
     return (
       matchesSearch &&
@@ -609,15 +632,41 @@ export default function Activities() {
       matchesPriority &&
       matchesClient &&
       matchesFromDate &&
-      matchesToDate
+      matchesToDate &&
+      matchesTicketVisibility
     );
   });
 
   const handleInputChange = (field, value) => {
-    setNewActivity((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+    setNewActivity((prev) => {
+      const next = { ...prev, [field]: value };
+      if (field === "deadline") {
+        if (!value) {
+          next.reminderDate = "";
+          next.nextStepDate = "";
+        } else {
+          try {
+            const [y, m, d] = String(value).split("-").map((n) => parseInt(n, 10));
+            const base = new Date(y, (m || 1) - 1, d || 1);
+            if (!isNaN(base.getTime())) {
+              const fmt = (date) => {
+                const yy = date.getFullYear();
+                const mm = String(date.getMonth() + 1).padStart(2, "0");
+                const dd = String(date.getDate()).padStart(2, "0");
+                return `${yy}-${mm}-${dd}`;
+              };
+              const reminder = new Date(base);
+              reminder.setDate(reminder.getDate() - 2);
+              const nextStep = new Date(base);
+              nextStep.setDate(nextStep.getDate() + 1);
+              next.reminderDate = fmt(reminder);
+              next.nextStepDate = fmt(nextStep);
+            }
+          } catch {}
+        }
+      }
+      return next;
+    });
   };
 
   const handleAddActivity = () => {
@@ -2493,7 +2542,7 @@ export default function Activities() {
                 </Select>
               </div>
               {/* Category - Horizontal Radio Buttons */}
-              <div className="space-y-3">
+              <div className={`space-y-3 ${user?.department !== "Support" ? "hidden" : ""}`}>
                 <Label>Category *</Label>
                 <div className="flex space-x-6">
                   <div className="flex items-center space-x-2">
@@ -2544,9 +2593,27 @@ export default function Activities() {
                 <Label htmlFor="edit-linkedClient">Linked Client *</Label>
                 <Select
                   value={editActivity.linkedClient}
-                  onValueChange={(value) =>
-                    handleEditInputChange("linkedClient", value)
-                  }
+                  onValueChange={(value) => {
+                    let premium = false;
+                    try {
+                      const savedLeads = localStorage.getItem("sales_leads");
+                      const leads = savedLeads ? JSON.parse(savedLeads) : [];
+                      const match = Array.isArray(leads)
+                        ? leads.find((l) => l?.name === value)
+                        : null;
+                      if (match && typeof match.isPremium === "boolean") premium = !!match.isPremium;
+                      if (!premium) {
+                        const savedOrgs = localStorage.getItem("organizationData");
+                        const orgs = savedOrgs ? JSON.parse(savedOrgs) : [];
+                        const org = Array.isArray(orgs)
+                          ? orgs.find((o) => o?.organizationName === value)
+                          : null;
+                        if (org && typeof org.premiumSupport === "boolean") premium = !!org.premiumSupport;
+                      }
+                    } catch {}
+                    handleEditInputChange("linkedClient", value);
+                    handleEditInputChange("premiumSupport", premium);
+                  }}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select organization" />
@@ -2820,7 +2887,7 @@ export default function Activities() {
             {/* Activity Details */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="edit-costPerActivity">Cost (€)</Label>
+                <Label htmlFor="edit-costPerActivity">Cost (��)</Label>
                 <Input
                   id="edit-costPerActivity"
                   type="number"

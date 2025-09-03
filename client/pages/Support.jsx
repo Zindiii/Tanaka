@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { TEAM_MEMBERS } from "@/constants/teamMembers";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLocation } from "react-router-dom";
 import {
   Card,
   CardContent,
@@ -245,6 +246,21 @@ const getUrgencyColor = (dueDate, priority) => {
   return "text-green-500";
 };
 
+const getCategoryColor = (category) => {
+  switch ((category || "").toString()) {
+    case "Bug":
+      return "bg-red-100 text-red-800 border-red-200";
+    case "Question":
+      return "bg-purple-100 text-purple-800 border-purple-200";
+    case "Feature":
+      return "bg-green-100 text-green-800 border-green-200";
+    case "Training":
+      return "bg-orange-100 text-orange-800 border-orange-200";
+    default:
+      return "bg-blue-100 text-blue-800 border-blue-200";
+  }
+};
+
 const formatTimeAgo = (dateString) => {
   const date = new Date(dateString);
   const now = new Date();
@@ -259,6 +275,7 @@ const formatTimeAgo = (dateString) => {
 
 export default function Support() {
   const { user } = useAuth();
+  const location = useLocation();
   const [selectedTickets, setSelectedTickets] = useState([]);
   const [selectedTeamMember, setSelectedTeamMember] = useState(null);
   const [isHighPriorityDialogOpen, setIsHighPriorityDialogOpen] =
@@ -266,6 +283,12 @@ export default function Support() {
   const [isOverdueDialogOpen, setIsOverdueDialogOpen] = useState(false);
   const [isPremiumDialogOpen, setIsPremiumDialogOpen] = useState(false);
   const [isRegisterDialogOpen, setIsRegisterDialogOpen] = useState(false);
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(location.search);
+      if (params.get("register")) setIsRegisterDialogOpen(true);
+    } catch {}
+  }, [location.search]);
   const [isTicketViewOpen, setIsTicketViewOpen] = useState(false);
   const [selectedTicketActivity, setSelectedTicketActivity] = useState(null);
   const [isEditingTicket, setIsEditingTicket] = useState(false);
@@ -304,19 +327,19 @@ export default function Support() {
   const [activitiesList, setActivitiesList] = useState([]);
   useEffect(() => {
     try {
-      const saved = localStorage.getItem("activitiesList");
+      const saved = localStorage.getItem("supportTicketsList");
       setActivitiesList(saved ? JSON.parse(saved) : []);
     } catch {
       setActivitiesList([]);
     }
     const handler = () => {
       try {
-        const saved = localStorage.getItem("activitiesList");
+        const saved = localStorage.getItem("supportTicketsList");
         setActivitiesList(saved ? JSON.parse(saved) : []);
       } catch {}
     };
-    window.addEventListener("activitiesListUpdated", handler);
-    return () => window.removeEventListener("activitiesListUpdated", handler);
+    window.addEventListener("supportTicketsUpdated", handler);
+    return () => window.removeEventListener("supportTicketsUpdated", handler);
   }, []);
 
   const derivedTickets = (Array.isArray(activitiesList) ? activitiesList : [])
@@ -365,7 +388,7 @@ export default function Support() {
     derivedTickets.length > 0 ? derivedTickets : supportTickets;
 
   const highPriorityTickets = allTickets.filter(
-    (ticket) => ticket.priority === "urgent" || ticket.priority === "high",
+    (ticket) => ticket.priority === "urgent",
   );
 
   const overdueTickets = allTickets.filter((ticket) => {
@@ -458,7 +481,7 @@ export default function Support() {
       );
     });
 
-  const showHighPriorityTickets = () => {
+  const showUrgentPriorityTickets = () => {
     setSelectedTickets(highPriorityTickets);
     setIsHighPriorityDialogOpen(true);
   };
@@ -475,7 +498,7 @@ export default function Support() {
 
   const toggleActivityResolved = (id) => {
     try {
-      const saved = localStorage.getItem("activitiesList");
+      const saved = localStorage.getItem("supportTicketsList");
       const list = saved ? JSON.parse(saved) : [];
       const updated = Array.isArray(list)
         ? list.map((a) => {
@@ -503,8 +526,8 @@ export default function Support() {
             };
           })
         : [];
-      localStorage.setItem("activitiesList", JSON.stringify(updated));
-      window.dispatchEvent(new Event("activitiesListUpdated"));
+      localStorage.setItem("supportTicketsList", JSON.stringify(updated));
+      window.dispatchEvent(new Event("supportTicketsUpdated"));
     } catch {}
   };
 
@@ -516,14 +539,14 @@ export default function Support() {
     );
     if (!should) return;
     try {
-      const saved = localStorage.getItem("activitiesList");
+      const saved = localStorage.getItem("supportTicketsList");
       const list = saved ? JSON.parse(saved) : [];
       const ids = new Set(filteredSupportActivities.map((a) => a.id));
       const updated = Array.isArray(list)
         ? list.filter((a) => !ids.has(a.id))
         : [];
-      localStorage.setItem("activitiesList", JSON.stringify(updated));
-      window.dispatchEvent(new Event("activitiesListUpdated"));
+      localStorage.setItem("supportTicketsList", JSON.stringify(updated));
+      window.dispatchEvent(new Event("supportTicketsUpdated"));
       setSelectedIds((prev) => prev.filter((id) => !ids.has(id)));
       setSelectionMode(false);
     } catch {}
@@ -593,7 +616,7 @@ export default function Support() {
             <p className="text-sm text-gray-600">Open Tickets</p>
             <div className="mt-2">
               <Badge className="bg-red-100 text-red-800 text-xs">
-                {highPriorityTickets.length} High Priority
+                {highPriorityTickets.length} Urgent Priority
               </Badge>
             </div>
           </CardContent>
@@ -735,17 +758,17 @@ export default function Support() {
                   );
                   if (!should) return;
                   try {
-                    const saved = localStorage.getItem("activitiesList");
+                    const saved = localStorage.getItem("supportTicketsList");
                     const list = saved ? JSON.parse(saved) : [];
                     const idSet = new Set(selectedIds);
                     const updated = Array.isArray(list)
                       ? list.filter((a) => !idSet.has(a.id))
                       : [];
                     localStorage.setItem(
-                      "activitiesList",
+                      "supportTicketsList",
                       JSON.stringify(updated),
                     );
-                    window.dispatchEvent(new Event("activitiesListUpdated"));
+                    window.dispatchEvent(new Event("supportTicketsUpdated"));
                     setSelectedIds([]);
                     setSelectionMode(false);
                   } catch {}
@@ -804,7 +827,7 @@ export default function Support() {
                 onValueChange={setSelectedPremiumClient}
               >
                 <SelectTrigger className="bg-background/80">
-                  <SelectValue placeholder="Premium Clients" />
+                  <SelectValue placeholder="Premium" />
                 </SelectTrigger>
                 <SelectContent>
                   {["All", "Premium", "Not Premium"].map((opt) => (
@@ -936,11 +959,11 @@ export default function Support() {
         <CardContent>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             <Button
-              onClick={showHighPriorityTickets}
+              onClick={showUrgentPriorityTickets}
               className="w-full h-24 flex flex-col items-center justify-center gap-2 text-center bg-gradient-to-br from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700"
             >
               <AlertTriangle className="h-6 w-6" />
-              <span className="text-sm">High Priority Tickets</span>
+              <span className="text-sm">Urgent Priority tickets</span>
               <Badge className="bg-red-700 text-white">
                 {highPriorityTickets.length}
               </Badge>
@@ -1008,7 +1031,7 @@ export default function Support() {
                     {activity.ticketType && (
                       <Badge
                         variant="outline"
-                        className="bg-blue-100 text-blue-800 border-blue-200"
+                        className={getCategoryColor(activity.ticketType)}
                       >
                         {activity.ticketType}
                       </Badge>
@@ -1388,7 +1411,7 @@ export default function Support() {
         </DialogContent>
       </Dialog>
 
-      {/* High Priority Tickets Dialog */}
+      {/* Urgent Priority Tickets Dialog */}
       <Dialog
         open={isHighPriorityDialogOpen}
         onOpenChange={setIsHighPriorityDialogOpen}
@@ -1397,10 +1420,10 @@ export default function Support() {
           <DialogHeader>
             <DialogTitle className="flex items-center space-x-2">
               <AlertTriangle className="h-5 w-5 text-red-600" />
-              <span>High Priority Tickets</span>
+              <span>Urgent Priority Tickets</span>
             </DialogTitle>
             <DialogDescription>
-              Urgent and high priority support tickets requiring immediate
+              Urgent priority support tickets requiring immediate
               attention
             </DialogDescription>
           </DialogHeader>
@@ -1693,7 +1716,7 @@ export default function Support() {
       {/* Register Ticket Dialog */}
       <Dialog
         open={isRegisterDialogOpen}
-        onOpenChange={setIsRegisterDialogOpen}
+        onOpenChange={(open) => open && setIsRegisterDialogOpen(open)}
       >
         <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
@@ -1705,7 +1728,7 @@ export default function Support() {
             <DialogDescription>
               {isEditingTicket
                 ? "Update the support ticket. Changes will also appear in Activities."
-                : "Create a new support ticket. It will also appear in Activities."}
+                : "Create a new support ticket."}
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-2">
@@ -1733,7 +1756,7 @@ export default function Support() {
                     <SelectValue placeholder="Select source" />
                   </SelectTrigger>
                   <SelectContent>
-                    {["website", "Refferral", "call", "partner", "Event"].map(
+                    {["Call", "E-mail", "Whatsapp"].map(
                       (s) => (
                         <SelectItem key={s} value={s}>
                           {s}
@@ -1815,11 +1838,15 @@ export default function Support() {
                 </SelectTrigger>
                 <SelectContent>
                   {[
-                    "4S System",
-                    "Client Portal",
-                    "Mobile App",
-                    "Analytics Dashboard",
-                    "Integrations",
+                    "SOM Natječaj",
+                    "SOM Udruge",
+                    "SOM Sport",
+                    "SOM Home",
+                    "SOM Jed. nabava",
+                    "SOM System",
+                    "Triumphy Natječaj",
+                    "Triumphy Udruge",
+                    "Triumphy Sport",
                   ].map((a) => (
                     <SelectItem key={a} value={a}>
                       {a}
@@ -1946,88 +1973,6 @@ export default function Support() {
                 )}
               </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="ticket-priority">Priority</Label>
-                <Select
-                  value={newTicket.priority}
-                  onValueChange={(val) =>
-                    setNewTicket((v) => ({ ...v, priority: val }))
-                  }
-                >
-                  <SelectTrigger
-                    className={
-                      newTicket.priority
-                        ? getPriorityColor(newTicket.priority) +
-                          " bg-opacity-20"
-                        : ""
-                    }
-                  >
-                    <SelectValue placeholder="Select priority" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem
-                      value="urgent"
-                      className={
-                        getPriorityColor("urgent") + " hover:opacity-90"
-                      }
-                    >
-                      Urgent
-                    </SelectItem>
-                    <SelectItem
-                      value="high"
-                      className={getPriorityColor("high") + " hover:opacity-90"}
-                    >
-                      High
-                    </SelectItem>
-                    <SelectItem
-                      value="medium"
-                      className={
-                        getPriorityColor("medium") + " hover:opacity-90"
-                      }
-                    >
-                      Medium
-                    </SelectItem>
-                    <SelectItem
-                      value="low"
-                      className={getPriorityColor("low") + " hover:opacity-90"}
-                    >
-                      Low
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="ticket-category">Category</Label>
-                <Select
-                  value={newTicket.category}
-                  onValueChange={(val) =>
-                    setNewTicket((v) => ({ ...v, category: val }))
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Bug">Bug</SelectItem>
-                    <SelectItem value="Question">Question</SelectItem>
-                    <SelectItem value="Feature">Feature</SelectItem>
-                    <SelectItem value="Training">Training</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="ticket-dueDate">Due Date</Label>
-              <Input
-                id="ticket-dueDate"
-                type="date"
-                value={newTicket.dueDate}
-                onChange={(e) =>
-                  setNewTicket((v) => ({ ...v, dueDate: e.target.value }))
-                }
-              />
-            </div>
             <div className="space-y-2">
               <Label htmlFor="ticket-description">Description</Label>
               <Textarea
@@ -2093,7 +2038,7 @@ export default function Support() {
                   return;
                 }
                 try {
-                  const saved = localStorage.getItem("activitiesList");
+                  const saved = localStorage.getItem("supportTicketsList");
                   const list = saved ? JSON.parse(saved) : [];
                   const mapPriority = (p) =>
                     p === "urgent"
@@ -2125,10 +2070,10 @@ export default function Support() {
                         )
                       : [];
                     localStorage.setItem(
-                      "activitiesList",
+                      "supportTicketsList",
                       JSON.stringify(updated),
                     );
-                    window.dispatchEvent(new Event("activitiesListUpdated"));
+                    window.dispatchEvent(new Event("supportTicketsUpdated"));
                     setIsRegisterDialogOpen(false);
                     setIsEditingTicket(false);
                     setEditingActivityId(null);
@@ -2182,10 +2127,10 @@ export default function Support() {
                     };
                     const updated = [activity, ...list];
                     localStorage.setItem(
-                      "activitiesList",
+                      "supportTicketsList",
                       JSON.stringify(updated),
                     );
-                    window.dispatchEvent(new Event("activitiesListUpdated"));
+                    window.dispatchEvent(new Event("supportTicketsUpdated"));
                     setIsRegisterDialogOpen(false);
                     setNewTicket({
                       title: "",

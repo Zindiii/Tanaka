@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ChevronDown, ChevronUp, Filter as FilterIcon } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function TimelinePage() {
   const [activities, setActivities] = React.useState(() => {
@@ -47,9 +48,10 @@ export default function TimelinePage() {
   const [toDate, setToDate] = React.useState("");
 
   const allClients = React.useMemo(() => {
-    const orgNames = Array.isArray(organizations) ? organizations.map(o => o?.organizationName).filter(Boolean) : [];
-    const actNames = (activities || []).map(a => a.linkedClient).filter(Boolean);
-    const leadNames = Array.isArray(leads) ? leads.map(l => l?.name).filter(Boolean) : [];
+    const norm = (s) => (s || "").trim();
+    const orgNames = Array.isArray(organizations) ? organizations.map(o => norm(o?.organizationName)).filter(Boolean) : [];
+    const actNames = (activities || []).map(a => norm(a.linkedClient)).filter(Boolean);
+    const leadNames = Array.isArray(leads) ? leads.map(l => norm(l?.name)).filter(Boolean) : [];
     const set = new Set([...orgNames, ...actNames, ...leadNames]);
     return ["All Clients", ...Array.from(set).sort()];
   }, [organizations, activities, leads]);
@@ -106,11 +108,13 @@ export default function TimelinePage() {
     setToDate("");
   };
 
+  const { user } = useAuth();
   const filteredActivities = React.useMemo(() => {
+    const isSupport = user?.department === "Support";
     return (activities || []).filter(a => {
       const responsibleString = Array.isArray(a.responsible) ? a.responsible.join(", ") : (a.responsible || "");
       const matchesSearch = [a.linkedClient, responsibleString, a.notes].join(" ").toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesClient = selectedClient === "All Clients" || a.linkedClient === selectedClient;
+      const matchesClient = selectedClient === "All Clients" || (a.linkedClient || "").trim().toLowerCase() === selectedClient.trim().toLowerCase();
       const matchesType = selectedType === "All Types" || a.activityType === selectedType;
       const matchesStatus = selectedStatus === "All Statuses" || a.status === selectedStatus;
       const matchesPriority = selectedPriority === "All Priorities" || a.priority === selectedPriority;
@@ -119,9 +123,10 @@ export default function TimelinePage() {
       const matchesTo = !toDate || (a.date && a.date <= toDate);
       const premium = isPremiumClient(a.linkedClient);
       const matchesPremium = selectedPremium === "All" || (selectedPremium === "Premium" ? premium : !premium);
-      return matchesSearch && matchesClient && matchesType && matchesStatus && matchesPriority && matchesMember && matchesFrom && matchesTo && matchesPremium;
+      const matchesTicketVisibility = isSupport ? true : !a?.isTicket;
+      return matchesSearch && matchesClient && matchesType && matchesStatus && matchesPriority && matchesMember && matchesFrom && matchesTo && matchesPremium && matchesTicketVisibility;
     });
-  }, [activities, searchTerm, selectedClient, selectedType, selectedStatus, selectedPriority, selectedMember, fromDate, toDate, selectedPremium, isPremiumClient]);
+  }, [activities, searchTerm, selectedClient, selectedType, selectedStatus, selectedPriority, selectedMember, fromDate, toDate, selectedPremium, isPremiumClient, user?.department]);
 
   React.useEffect(() => {
     const reload = () => {
