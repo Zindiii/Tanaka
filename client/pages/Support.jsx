@@ -1716,7 +1716,7 @@ export default function Support() {
       {/* Register Ticket Dialog */}
       <Dialog
         open={isRegisterDialogOpen}
-        onOpenChange={setIsRegisterDialogOpen}
+        onOpenChange={(open) => open && setIsRegisterDialogOpen(open)}
       >
         <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
