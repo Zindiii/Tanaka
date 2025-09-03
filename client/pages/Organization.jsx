@@ -733,7 +733,7 @@ export default function Organization() {
             <p className="text-sm text-blue-600">
               Found {filteredData.length} organization{filteredData.length !== 1 ? 's' : ''}
             </p>
-            <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+            <Dialog open={isAddDialogOpen} onOpenChange={(open) => open && setIsAddDialogOpen(open)}>
               <DialogTrigger asChild>
                 <Button className="bg-blue-600 hover:bg-blue-700 text-white">
                   <Plus className="h-4 w-4 mr-2" />
