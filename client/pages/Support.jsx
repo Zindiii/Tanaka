@@ -2018,17 +2018,6 @@ export default function Support() {
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="ticket-dueDate">Due Date</Label>
-              <Input
-                id="ticket-dueDate"
-                type="date"
-                value={newTicket.dueDate}
-                onChange={(e) =>
-                  setNewTicket((v) => ({ ...v, dueDate: e.target.value }))
-                }
-              />
-            </div>
-            <div className="space-y-2">
               <Label htmlFor="ticket-description">Description</Label>
               <Textarea
                 id="ticket-description"
