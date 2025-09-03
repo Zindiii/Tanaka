@@ -394,7 +394,7 @@ export default function Support() {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedType, setSelectedType] = useState("All Categories");
-  const [selectedPremiumClient, setSelectedPremiumClient] = useState("All");
+  const [selectedPremiumClient, setSelectedPremiumClient] = useState("Premium");
   const [selectedStatus, setSelectedStatus] = useState("All Statuses");
   const [selectedMember, setSelectedMember] = useState("All Members");
   const [selectedPriority, setSelectedPriority] = useState("All Priorities");
@@ -804,7 +804,7 @@ export default function Support() {
                 onValueChange={setSelectedPremiumClient}
               >
                 <SelectTrigger className="bg-background/80">
-                  <SelectValue placeholder="Premium Clients" />
+                  <SelectValue placeholder="Premium" />
                 </SelectTrigger>
                 <SelectContent>
                   {["All", "Premium", "Not Premium"].map((opt) => (
