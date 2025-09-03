@@ -246,6 +246,21 @@ const getUrgencyColor = (dueDate, priority) => {
   return "text-green-500";
 };
 
+const getCategoryColor = (category) => {
+  switch ((category || "").toString()) {
+    case "Bug":
+      return "bg-red-100 text-red-800 border-red-200";
+    case "Question":
+      return "bg-purple-100 text-purple-800 border-purple-200";
+    case "Feature":
+      return "bg-green-100 text-green-800 border-green-200";
+    case "Training":
+      return "bg-orange-100 text-orange-800 border-orange-200";
+    default:
+      return "bg-blue-100 text-blue-800 border-blue-200";
+  }
+};
+
 const formatTimeAgo = (dateString) => {
   const date = new Date(dateString);
   const now = new Date();
@@ -1016,7 +1031,7 @@ export default function Support() {
                     {activity.ticketType && (
                       <Badge
                         variant="outline"
-                        className="bg-blue-100 text-blue-800 border-blue-200"
+                        className={getCategoryColor(activity.ticketType)}
                       >
                         {activity.ticketType}
                       </Badge>
