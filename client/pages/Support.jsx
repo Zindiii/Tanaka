@@ -940,7 +940,7 @@ export default function Support() {
               className="w-full h-24 flex flex-col items-center justify-center gap-2 text-center bg-gradient-to-br from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700"
             >
               <AlertTriangle className="h-6 w-6" />
-              <span className="text-sm">High Priority Tickets</span>
+              <span className="text-sm">Urgent Priority tickets</span>
               <Badge className="bg-red-700 text-white">
                 {highPriorityTickets.length}
               </Badge>
